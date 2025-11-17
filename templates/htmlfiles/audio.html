@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>About</title>
+{% endblock %}
+{% block childcode_block %}
+    <section class="audio-hero">
+        <audio id="introAudio" autoplay loop>
+            <source src="https://www.sousound.com/music/healing/healing_01.mp3" type="audio/mpeg">
+        </audio>
+        <div class="hero-content">
+            <h1>Timeless Teachings, Eternal Harmony</h1>
+            <p>Listen. Reflect. Awaken.</p>
+        </div>
+    </section>
+    <!-- 🎶 Audio Library -->
+    <section class="audio-library-modern">
+        <h2>Pravachanam Collections</h2>
+        <div class="audio-grid-modern">
+            <div class="audio-card-modern" data-category="upanisad">
+                <h3>Upanishad Pravachanam</h3>
+            </div>
+            <div class="audio-card-modern" data-category="bhagavadgita">
+                <h3>Bhagavad Gita Pravachanam</h3>
+            </div>
+            <div class="audio-card-modern" data-category="grantha">
+                <h3>Granthas & Commentaries</h3>
+            </div>
+            <div class="audio-card-modern" data-category="vidyaranya">
+                <h3>Vidyaranaya Swami Pravachanam</h3>
+            </div>
+            <div class="audio-card-modern" data-category="vidyaranya">
+                <h3>Vidyaranaya Swami Pravachanam</h3>
+            </div>
+            <div class="audio-card-modern" data-category="bhagavadgita">
+                <h3>Bhagavad Gita Pravachanam</h3>
+            </div>
+        </div>
+    </section>
+    <!-- 🌙 FOOTER -->
+    <footer class="footer text-center py-4">
+        <div class="container">
+            <p class="mb-0 text-light small">
+                &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
+            </p>
+        </div>
+    </footer>
+    <!-- 🎧 Bottom Sheet Modal -->
+    <div id="audioModal" class="audio-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modalTitle">Pravachanam</span>
+                <button id="closeModal">&times;</button>
+            </div>
+            <ul id="audioList"></ul>
+            <audio id="audioPlayer" controls></audio>
+        </div>
+    </div>
+    <script src="{% static 'js/audio.js' %}"></script>
+{% endblock %}

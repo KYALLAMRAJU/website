@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+
+{% block title_block %}
+    <title>Home | Advaita Vedanta</title>
+{% endblock %}
+
+{% block childcode_block %}
+    {% if messages %}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                {% for message in messages %}
+                    let titleText = "";
+                    let iconType = "";
+                    let msgText = "{{ message }}";
+
+                    // 🔹 Determine title/icon based on tag
+                    {% if message.tags == "success" %}
+                        // Distinguish login vs mail success
+                        if (msgText.includes("Welcome back")) {
+                            titleText = "👋 Welcome Back!";
+                        } else if (msgText.includes("request has been sent")) {
+                            titleText = "📧 Query Sent!";
+                        } else {
+                            titleText = "📧 Query Sent!";
+                        }
+                        iconType = "success";
+
+                    {% elif message.tags == "error" %}
+                        titleText = "⚠️ Error!";
+                        iconType = "error";
+
+                    {% elif message.tags == "info" %}
+                        titleText = "ℹ️ Info";
+                        iconType = "info";
+
+                    {% else %}
+                        titleText = "🔔 Notice";
+                        iconType = "info";
+                    {% endif %}
+
+                    Swal.fire({
+                        title: titleText,
+                        text: msgText,
+                        icon: iconType,
+                        timer: 4000,
+                        showConfirmButton: false,
+                        background: "#fdfdfd",
+                        color: "#333",
+                        position: "center",
+                        timerProgressBar: true,
+                        customClass: {popup: "swal2-rounded"},
+                        didOpen: (popup) => {
+                            popup.style.borderRadius = "20px";
+                            popup.style.boxShadow = "0 0 15px rgba(0, 0, 0, 0.15)";
+                        }
+                    });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+
+    <!-- 🏡 Hero Section -->
+    <header class="hero-section text-center text-white d-flex align-items-center justify-content-center">
+        <div class="container">
+            <h1 class="fw-bold mb-3">Embrace Timeless Wisdom</h1>
+            <p class="mb-4">
+                Discover the teachings of Advaita Vedanta — a journey towards unity, peace, and truth. Discover the
+                teachings of
+                Advaita Vedanta — a journey towards unity, peace, and truth. Discover the teachings of Advaita Vedanta —
+                a journey
+                towards unity, peace, and truth.
+            </p>
+            <a href="#about" class="btn btn-lg btn-warning fw-semibold shadow-sm px-4 py-2">Get Started</a>
+        </div>
+    </header>
+
+    <!-- 🌿 About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container px-5">
+            <div class="row align-items-center gx-5">
+                <div class="col-lg-6 text-center">
+                    <img src="{% static 'images/SrinivasaRao.png' %}" class="img-fluid rounded-4 shadow"
+                         alt="Advaita Vedanta Guru">
+                </div>
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <h2 class="fw-bold mb-3 text-primary">Our Philosophy</h2>
+                    <p class="lead text-muted">
+                        Advaita Vedanta teaches the oneness of the individual soul (Atman) and the universal soul
+                        (Brahman). It’s a
+                        philosophy that transcends time — guiding seekers toward self-realization and inner harmony.
+                    </p>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fa-solid fa-check text-success me-2"></i>Non-dualistic teachings of self-awareness
+                        </li>
+                        <li><i class="fa-solid fa-check text-success me-2"></i>Path of wisdom and introspection</li>
+                        <li><i class="fa-solid fa-check text-success me-2"></i>Freedom through realization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🌸 Featured Cards -->
+    <section id="features" class="cards-section py-5">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-5">Explore Our Sections</h2>
+            <div class="row justify-content-center g-4">
+                <!-- Philosophy Card -->
+                <div class="col-sm-6 col-md-4 d-flex justify-content-center">
+                    <a href="/about/" class="card-link">
+                        <div class="feature-card text-center p-4">
+                            <i class="fa-solid fa-om fa-2x text-success mb-3"></i>
+                            <h5 class="fw-bold">Philosophy</h5>
+                            <p class="text-muted small">
+                                Discover the essence of Advaita Vedanta — realizing oneness beyond all dualities.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Meditation Card -->
+                <div class="col-sm-6 col-md-4 d-flex justify-content-center">
+                    <a href="/audio/" class="card-link">
+                        <div class="feature-card text-center p-4">
+                            <i class="fa-solid fa-person-praying fa-2x text-primary mb-3"></i>
+                            <h5 class="fw-bold">Meditation & Reflection</h5>
+                            <p class="text-muted small">Listen, reflect, and meditate to find stillness and inner
+                                wisdom.</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Service & Devotion Card -->
+                <div class="col-sm-6 col-md-4 d-flex justify-content-center">
+                    <a href="/gallery/" class="card-link">
+                        <div class="feature-card text-center p-4">
+                            <i class="fa-solid fa-hands-holding fa-2x text-danger mb-3"></i>
+                            <h5 class="fw-bold">Service & Devotion</h5>
+                            <p class="text-muted small">
+                                Walk the path of compassion and unity through devotion and service.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🌙 FOOTER -->
+    <footer class="footer text-center py-4">
+        <div class="container">
+            <p class="mb-0 text-light small">
+                &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
+            </p>
+        </div>
+    </footer>
+    <script>
+        window.addEventListener("scroll", function () {
+            const nav = document.querySelector(".glass-nav");
+            if (window.scrollY > 50) nav.classList.add("scrolled");
+            else nav.classList.remove("scrolled");
+        });
+    </script>
+{% endblock %}

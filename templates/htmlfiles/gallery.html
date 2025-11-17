@@ -1,0 +1,78 @@
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+
+{% block title_block %}
+    <title>Gallery | Advaita Vedanta</title>
+{% endblock %}
+
+{% block childcode_block %}
+    <section class="gallery-page py-5 mt-5">
+        <div class="container text-center">
+
+            <!-- Heading -->
+            <h1 class="fw-bold mb-4 text-primary">Our Spiritual Gallery</h1>
+            <p class="text-secondary mb-5">
+                A glimpse into the divine — celebrating knowledge, peace, and devotion.
+            </p>
+
+            <!-- Centered Image Grid -->
+            <div class="gallery-container">
+                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
+                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
+                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
+                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
+                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
+                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
+                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
+                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
+                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
+                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
+                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
+                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
+                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
+                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
+                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
+                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <!-- 🌙 FOOTER -->
+    <footer class="footer text-center py-4">
+        <div class="container">
+            <p class="mb-0 text-light small">
+                &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Lightbox JS
+        const lightbox = document.getElementById("lightbox");
+        const lightboxImg = document.getElementById("lightbox-img");
+        const closeBtn = document.querySelector(".close");
+
+        document.querySelectorAll(".gallery-img").forEach(img => {
+            img.addEventListener("click", () => {
+                lightbox.style.display = "flex";
+                lightboxImg.src = img.src;
+            });
+        });
+
+        closeBtn.addEventListener("click", () => {
+            lightbox.style.display = "none";
+        });
+
+        // Close on clicking outside image
+        lightbox.addEventListener("click", (e) => {
+            if (e.target !== lightboxImg) lightbox.style.display = "none";
+        });
+    </script>
+{% endblock %}

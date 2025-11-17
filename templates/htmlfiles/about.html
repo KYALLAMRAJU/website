@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>About</title>
+{% endblock %}
+{% block childcode_block %}
+    <!--Header-->
+    <header class="py-4 bg-body-secondary">
+        <div class="container px-4 pt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xxl-6">
+                    <div class="text-center my-4">
+                        <h1 class="display-5 fw-bolder text-secondary mb-2">Our mission is to make building websites
+                            easier
+                            for everyone.</h1>
+                        <p class="lead fw-normal text-secondary-emphasis mb-4">Start Bootstrap was built on the idea
+                            that quality,
+                            functional website templates and themes should be available to everyone. Use our open
+                            source,
+                            free products, or support us by purchasing one of our premium products or services.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--About-->
+    <section class="page-section" id="about">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">ABOUT</h2>
+                <p class="text-muted">Lorem ipsum dolor sit amet consectetur.</p>
+            </div>
+            <ul class="timeline">
+                <!-- Item 1 -->
+                <li>
+                    <div class="timeline-image">
+                        <img class="rounded-circle img-fluid" src="{% static "images/SrinivasaRao.png" %}" alt=" ">
+                    </div>
+                    <div class="timeline-panel bg-body-secondary">
+                        <div class="timeline-heading">
+                            <h4>{{first.phase}}</h4>
+                           <a href="{{ first.get_absolute_url }}" target="_blank"><h4 class="subheading">{{first.title}}</h4></a>
+                        </div>
+                        <div class="timeline-body">
+                            <p class="text-muted">{{ first.body|truncatewords:30|linebreaks }}</p>
+                        </div>
+                    </div>
+                </li>
+                <!-- Item 2 -->
+                <li class="timeline-inverted">
+                    <div class="timeline-image">
+                        <img class="rounded-circle img-fluid" src="{% static "images/SrinivasaRao.png" %}" alt=" ">
+                    </div>
+                    <div class="timeline-panel bg-body-secondary">
+                        <div class="timeline-heading">
+                            <h4>{{second.phase}}</h4>
+                           <a href="{{ second.get_absolute_url }}" target="_blank"><h4 class="subheading">{{second.title}}</h4></a>
+                        </div>
+                        <div class="timeline-body">
+                           <p class="text-muted">{{ second.body|truncatewords:30|linebreaks }}</p>
+                        </div>
+                    </div>
+                </li>
+                <!-- Item 3 -->
+                <li>
+                    <div class="timeline-image">
+                        <img class="rounded-circle img-fluid" src="{% static "images/SrinivasaRao.png" %}" alt=" ">
+                    </div>
+                    <div class="timeline-panel bg-body-secondary">
+                        <div class="timeline-heading">
+                            <h4>{{third.phase}}</h4>
+                            <a href="{{ third.get_absolute_url }}" target="_blank"><h4 class="subheading">{{third.title}}</h4></a>
+                        </div>
+                        <div class="timeline-body">
+                           <p class="text-muted">{{ third.body|truncatewords:30|linebreaks }}</p>
+                        </div>
+                    </div>
+                </li>
+                <!-- Item 4 -->
+                <li class="timeline-inverted">
+                    <div class="timeline-image">
+                        <img class="rounded-circle img-fluid" src="{% static "images/SrinivasaRao.png" %}" alt=" ">
+                    </div>
+                    <div class="timeline-panel bg-body-secondary">
+                        <div class="timeline-heading">
+                            <h4>{{fourth.phase}}</h4>
+                            <a href="{{ fourth.get_absolute_url }}" target="_blank"><h4 class="subheading">{{fourth.title}}</h4></a>
+                        </div>
+                        <div class="timeline-body">
+                            <p class="text-muted">{{ fourth.body|truncatewords:30|linebreaks }}</p>
+                        </div>
+                    </div>
+                </li>
+{#                <div class="text-center mt-4">#}
+{#                    <a class="btn btn-primary btn-lg" href="#">Click on links above to Know more about Guruji</a>#}
+{#                </div>#}
+            </ul>
+        </div>
+    </section>
+    <!--Information section-->
+    <section class="bg-body-secondary py-1" id="is">
+        <div class="container px-5 my-5">
+            <div class="row gx-5 align-items-center">
+                <div class="col-lg-6">
+                    <div class="text-center my-5">
+                        <h2 class="fw-bolder">Our founding</h2>
+                        <p class="lead fw-normal text-muted mb-0">Lorem ipsum dolor sit amet consectetur adipisicing
+                            elit.
+                            Iusto est, ut esse a labore aliquam beatae expedita. Blanditiis impedit numquam libero
+                            molestiae
+                            et fugit cupiditate, quibusdam expedita, maiores eaque quisquam.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-5 mb-lg-0 ">
+                    <img class="rounded-circle img-fluid" src="{% static "images/SrinivasaRao.png" %}" alt=" ">
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- 🌙 FOOTER -->
+    <footer class="footer text-center py-4">
+        <div class="container">
+            <p class="mb-0 text-light small">
+                &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
+            </p>
+        </div>
+    </footer>
+{% endblock %}

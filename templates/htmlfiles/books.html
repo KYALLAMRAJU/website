@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Books</title>
+{% endblock %}
+{% block childcode_block %}
+    <section class="library-section py-5">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-4 mt-5">Digital Wisdom Library</h2>
+            <p class="text-muted mb-5">Explore sacred texts and timeless philosophies in a new light.</p>
+
+            <div class="bookshelf d-flex flex-wrap justify-content-center gap-5">
+
+                <!-- Bhagavad Gita -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1581092335305-89a69beba9e7?auto=format&fit=crop&w=400"
+                                 alt="Bhagavad Gita">
+                            <div class="book-title">Bhagavad Gita</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Bhagavad Gita</h5>
+                            <p>The timeless dialogue between Krishna and Arjuna.</p>
+                            <a href="{% static 'books/Django.pdf' %}" target="_blank" class="btn-read">Open
+                                Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upanishads -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400"
+                                 alt="Upanishads">
+                            <div class="book-title">Upanishads</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Upanishads</h5>
+                            <p>Exploring the eternal Self and the supreme Truth.</p>
+                            <a href="{% static 'books/upanishads.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upanishads -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400"
+                                 alt="Upanishads">
+                            <div class="book-title">Upanishads</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Upanishads</h5>
+                            <p>Exploring the eternal Self and the supreme Truth.</p>
+                            <a href="{% static 'books/upanishads.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advaita Philosophy -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
+                                 alt="Advaita Philosophy">
+                            <div class="book-title">Advaita Philosophy</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Advaita Philosophy</h5>
+                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advaita Philosophy -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
+                                 alt="Advaita Philosophy">
+                            <div class="book-title">Advaita Philosophy</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Advaita Philosophy</h5>
+                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advaita Philosophy -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
+                                 alt="Advaita Philosophy">
+                            <div class="book-title">Advaita Philosophy</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Advaita Philosophy</h5>
+                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advaita Philosophy -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
+                                 alt="Advaita Philosophy">
+                            <div class="book-title">Advaita Philosophy</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Advaita Philosophy</h5>
+                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advaita Philosophy -->
+                <div class="book-3d">
+                    <div class="book-inner">
+                        <div class="book-front">
+                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
+                                 alt="Advaita Philosophy">
+                            <div class="book-title">Advaita Philosophy</div>
+                        </div>
+                        <div class="book-back">
+                            <h5>Advaita Philosophy</h5>
+                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- 🌙 FOOTER -->
+    <footer class="footer text-center py-4">
+        <div class="container">
+            <p class="mb-0 text-light small">
+                &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
+            </p>
+        </div>
+    </footer>
+{% endblock %}

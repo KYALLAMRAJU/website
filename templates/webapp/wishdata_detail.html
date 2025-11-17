@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<h1>{{ object.name.upper }}</h1>
+<ul>
+    <li>ID: {{ wishdata.id }}</li>
+    <li>USERNAME: {{ wishdata.username }}</li>
+    <li>NAME: {{ wishdata.name }}</li>
+    <li>MESSAGE: {{ wishdata.astrology_message }}</li>
+    <li>PHONE NUMBER: {{ wishdata.mobilenumber }}</li>
+</ul>
+<div class="align-center">
+    <a href="/wishupdatecbv/{{ object.id }}" class="btn btn-primary align-right">Update Wish</a>
+    <a href="/wishlistcbv2/" class="btn btn-primary align-right">LIST ALL</a>
+    <a href="/wishdeletecbv/{{ object.id }}" class="btn btn-danger align-right">delete ?</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login | Advaita Vedanta</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Link to Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Link to our developed CSS -->
+    <link rel="stylesheet" href="{% static "css/home.css" %}">
+    <!--jQuery for validation-->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* ===== GLOBAL MESSAGE STYLES ===== */
+
+        .alert {
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.4s ease-in-out;
+            margin-bottom: 14px;
+        }
+
+        /* Error = Red */
+        .alert-error,
+        .alert-danger {
+            background-color: #ffe6e6;
+            color: #cc0000;
+            border-left: 5px solid #cc0000;
+        }
+
+        /* Success = Green */
+        .alert-success {
+            background-color: #e8ffea;
+            color: #0a8b2b;
+            border-left: 5px solid #0a8b2b;
+        }
+
+        /* Warning = Yellow */
+        .alert-warning {
+            background-color: #fff8e1;
+            color: #a67c00;
+            border-left: 5px solid #a67c00;
+        }
+
+        /* Info = Blue */
+        .alert-info {
+            background-color: #e8f3ff;
+            color: #0e5db3;
+            border-left: 5px solid #0e5db3;
+        }
+
+        /* Close button hover effect */
+        .btn-close {
+            filter: brightness(0.6);
+        }
+
+        .btn-close:hover {
+            filter: brightness(1.2);
+        }
+
+        /* Fade animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="login-body">
+<div class="container">
+    <div class="row align-items-center gx-5">
+        <!-- LEFT SECTION -->
+        <div class="col-lg-6 text-center left-section">
+            <img src="{% static 'images/SrinivasaRao.png' %}" alt="Advaita Vedanta"/>
+            <h1>Advaita Vedanta</h1>
+        </div>
+        <!-- RIGHT SECTION -->
+        <div class="col-lg-6">
+            <div class="reset-card text-center">
+                <h2 class="text-uppercase mb-3">Welcome!</h2>
+                <p>Please enter your email and password</p>
+                <form method="POST" autocomplete="off">
+                    {% if messages %}<!--
+                        Login fails at view logic (wrong password, user inactive, etc.)-Your views.py (messages framework)
+                        -->
+                        <div class="mt-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}<!--
+                        Form is valid but logic fails (e.g. password mismatch in signup)-Your form clean() method-->
+                        <div class="error-text">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <!-- Email --><!--Individual field validation failure (invalid email, password too short, etc.)-Validation in forms.py field definitions-->
+                    <div class="mb-3">
+                        {{ form.loginemail }}
+                        {% if form.loginemail.errors %}
+                            <div class="text-danger small">{{ form.loginemail.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <!-- Password with Toggle -->
+                    <div class="position-relative mb-3">
+                        {{ form.loginpassword }}
+                        <i class="fa-solid fa-eye eye-icon" onclick="togglePassword('id_loginpassword', this)"
+                           style="position:absolute; right:12px; top:12px; cursor:pointer; color:#6c757d;"></i>
+                        {% if form.loginpassword.errors %}
+                            <div class="text-danger small">{{ form.loginpassword.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-check text-start my-4">
+                        <input class="form-check-input " type="checkbox" id="rememberPasswordCheck"/>
+                        <label class="form-check-label" for="rememberPasswordCheck">Remember password</label>
+                    </div>
+                    <button type="submit" class="btn btn-signup btn-primary w-100 mb-3" value="signin">SIGN IN</button>
+                    <div class="links">
+                        <p class="mb-1"><a href="/forgotpassword/">Forgot password?</a></p><br>
+                        <p class="mb-1 fw-semibold">Don’t have an account? &nbsp;<a href="/signupform/"
+                                                                                    class="fw-semibold">Sign Up</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function togglePassword(inputId, icon) {
+        let input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
+</body>
+</html>

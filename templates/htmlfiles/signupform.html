@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Link to Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Link to our developed CSS -->
+    <link rel="stylesheet" href="{% static "css/home.css" %}">
+    <!--jQuery for validation-->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="login-body">
+<div class="card text-center">
+    <div class="signup-icon">
+        <i class="bi bi-person-plus"></i>
+    </div>
+    <h2 class="card-title">Create Your Account</h2>
+    <p class="mb-2">Please enter details below to register your new account.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<!--
+            Form is valid but logic fails (e.g. password mismatch in signup)-Your form clean() method-->
+            <div class="error-text">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        <div class="mb-3">
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="text-danger small">{{ form.username.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="position-relative mb-3">
+            {{ form.password }}
+            <i class="fa-solid fa-eye eye-icon" onclick="togglePassword('id_password', this)"
+               style="position:absolute; right:12px; top:12px; cursor:pointer; color:#6c757d;"></i>
+            {% if form.password.errors %}
+                <div class="text-danger small">{{ form.password.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-signup btn-primary w-100 mb-3">SIGN UP</button>
+    </form>
+
+    <div>
+        <a href="/loginpage/" class="back-link">Already have an account? Login here</a>
+    </div>
+</div>
+<!-- Bootstrap JS + Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function togglePassword(inputId, icon) {
+        let input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
+</body>
+</html>
