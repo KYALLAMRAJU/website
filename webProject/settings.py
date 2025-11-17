@@ -9,8 +9,15 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+from logging import DEBUG
 from pathlib import Path
 import oracle_patch
+import os
+import environ
+BASE_DIR = Path(__file__).resolve().parent.parent # project base directory path __file__ refers to current file path (settings.py) .resolve() gives absolute path .parent.parent goes two levels up to project root
+env=environ.Env(DEBUG=(bool, False))
+env.read_env(os.path.join(str(BASE_DIR), '.env'))
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +28,14 @@ STATIC_DIR = BASE_DIR / 'static'
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=kzh0#)3^01cbip9@=!56dw*pamwdzu%*8k=4+n%l00_$dc!l('
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1","localhost"])
+
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
 # Application definition
 
@@ -49,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
     #'webapp.middleware.ExecutionFlowMiddleware'
 ]
 
@@ -77,10 +87,10 @@ WSGI_APPLICATION = 'webProject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.oracle',
-        'NAME': 'localhost:1521/xepdb1',
-        'USER': 'system',
-        'PASSWORD': '9441279267',
+        'ENGINE': env("DB_ENGINE"),  # 'django.db.backends.oracle'
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
     }
 }
 
@@ -129,6 +139,11 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
+# Directory where static files will be collected in production
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise: compress + cache static files for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -141,15 +156,15 @@ LOGIN_URL = '/loginpage/'
 LOGIN_REDIRECT_URL = '/home/'
 LOGOUT_REDIRECT_URL = '/loginpage/'
 SESSION_SAVE_EVERY_REQUEST = True  # refresh session timeout on each page view
-SESSION_COOKIE_AGE = 3600  # Session will expire in 1 hour (3600 seconds)
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # user is logged out when they close their browser even before 1 hour.
+SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE",default=3600)  # Session will expire in 1 hour (3600 seconds)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = env("SESSION_EXPIRE_AT_BROWSER_CLOSE")  # user is logged out when they close their browser even before 1 hour.
 
 # Email backend configuration for development (console backend)
 # Looking to send emails in production? Check out our Email API/SMTP product!
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = 'f13d84f7767b6e'
-EMAIL_HOST_PASSWORD = '19a6a9a88ade90'
-EMAIL_PORT = 2525
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'test@example.com'
+EMAIL_BACKEND = env("EMAIL_BACKEND")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")

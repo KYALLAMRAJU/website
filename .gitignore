@@ -1,3 +1,20 @@
-:wq
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
 
+# Django
+db.sqlite3
+media/
+staticfiles/
 
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
