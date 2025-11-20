@@ -578,6 +578,19 @@ ul.errorlist li {
 /*--------------------------------------------------------------------TRANSLATOR ICON-----------------------------------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------HOME PAGE-----------------------------------------------------------------------------------------------------*/
+.translate-toggle {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 9999;
+}
+
+#languageSelector {
+    background-color: white;
+    border-radius: 8px;
+    padding: 3px 6px;
+}
+
 .home-body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #a1c4fd, #c2e9fb);

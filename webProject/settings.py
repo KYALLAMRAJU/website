@@ -14,10 +14,11 @@ from pathlib import Path
 import oracle_patch
 import os
 import environ
-BASE_DIR = Path(__file__).resolve().parent.parent # project base directory path __file__ refers to current file path (settings.py) .resolve() gives absolute path .parent.parent goes two levels up to project root
-env=environ.Env(DEBUG=(bool, False))
-env.read_env(os.path.join(str(BASE_DIR), '.env'))
 
+BASE_DIR = Path(
+    __file__).resolve().parent.parent  # project base directory path __file__ refers to current file path (settings.py) .resolve() gives absolute path .parent.parent goes two levels up to project root
+env = environ.Env(DEBUG=(bool, False))
+env.read_env(os.path.join(str(BASE_DIR), '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +34,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1","localhost"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
@@ -58,8 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
-    #'webapp.middleware.ExecutionFlowMiddleware'
+    'webapp.middleware.ExecutionFlowMiddleware'
+    #'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'webProject.urls'
@@ -156,8 +157,9 @@ LOGIN_URL = '/loginpage/'
 LOGIN_REDIRECT_URL = '/home/'
 LOGOUT_REDIRECT_URL = '/loginpage/'
 SESSION_SAVE_EVERY_REQUEST = True  # refresh session timeout on each page view
-SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE",default=3600)  # Session will expire in 1 hour (3600 seconds)
-SESSION_EXPIRE_AT_BROWSER_CLOSE = env("SESSION_EXPIRE_AT_BROWSER_CLOSE")  # user is logged out when they close their browser even before 1 hour.
+SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE", default=3600)  # Session will expire in 1 hour (3600 seconds)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = env(
+    "SESSION_EXPIRE_AT_BROWSER_CLOSE")  # user is logged out when they close their browser even before 1 hour.
 
 # Email backend configuration for development (console backend)
 # Looking to send emails in production? Check out our Email API/SMTP product!
@@ -168,3 +170,13 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+
+# ========== PRODUCTION SECURITY ==========
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = "DENY"

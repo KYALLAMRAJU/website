@@ -206,8 +206,7 @@ def forgotpasswordForm_view(request):
 # login form using django built-in authentication system
 def loginForm_view(request):
     form = loginForm()
-    #print("THIS LINE IS FOR DEBUGGING PURPOSE ONLY: CURRENT : CHECKING IF IT IS HITTING THE MIDDLEWARE AND VIEW FUNCTION")
-    # print(10/0)  # this line is for testing purpose to check if middleware is working for exception handling
+    print("THIS LINE IS FOR DEBUGGING PURPOSE ONLY: CURRENT : CHECKING IF IT IS HITTING THE MIDDLEWARE AND VIEW FUNCTION")
     submitted = False
     if request.method == 'POST':
         form = loginForm(request.POST)
@@ -265,6 +264,7 @@ def aboutdetail_view(request,title):
 
 @login_required
 def audiopage_view(request):
+    #print(10/0)  # this line is for testing purpose to check if middleware is working for exception handling
     return render(request, 'htmlfiles/audio.html')
 
 
