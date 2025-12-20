@@ -164,7 +164,7 @@ class loginForm(forms.ModelForm):
         return total_cleaned_data
 
 
-    # THE BELOW ONES ARE FIELD LEVEL CLEAN METHODS USED FOR VALIDATING INDIVIDUAL FIELDS
+    #----------------------------THE BELOW ONES ARE FIELD LEVEL CLEAN METHODS USED FOR VALIDATING INDIVIDUAL FIELDS--------------------------------------------------------------------
     #
     #                                                             Here’s what each part means:
     # ^ means the start of the password.
@@ -217,14 +217,6 @@ class contactusForm(forms.ModelForm):
 
 
 
-
-
-
-
-
-
-
-
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #THE BELOW MODEL IS A TEMPORARY FORM TO STORE THE WISH DATA FOR MY PRACTICE
@@ -232,5 +224,22 @@ class wishForm(forms.ModelForm):
     class Meta:
         model=wishdata
         fields='__all__'
+
+    def clean(self):
+        total_cleaned_data = super().clean()
+        mobilenumber = total_cleaned_data['mobilenumber']
+        if mobilenumber <= 0:
+            raise forms.ValidationError("Mobile number should be a positive number")
+        if len(str(mobilenumber)) != 10:
+            raise forms.ValidationError("Mobile number should be exactly 10 digits long")
+        name=total_cleaned_data['name']
+        if not all(x.isalpha() or x.isspace() for x in name):
+            raise forms.ValidationError("Name should contain only alphabetic characters and spaces")
+        username=total_cleaned_data['username']
+        has_alpha=any(x.isalpha() for x in username)
+        has_digit=any(x.isdigit() for x in username)
+        if not (has_alpha and has_digit):
+            raise forms.ValidationError("Username should contain both alphabetic characters and numbers,(no special characters).")
+        return total_cleaned_data
 
 

@@ -32,31 +32,29 @@
 <h1>{{ msg }}{{ date }}</h1>
 <h2>Find below your astrology details for {{ user }}</h2>
 <p>Very soon {{ astrology_message }} with {{ names }}</p>
-{% if wish_list %}                                                                    <!--if wish_list is not empty--->
+{% if wish_list %}                                                  <!--if wish_list is not empty--->
     <table class="table table-striped table-hover table-sm table-bordered table-light align-center">
-
         <thead>
+        <th>ID</th>
         <th>NAME</th>
         <th>MESSAGE</th>
         <th>ACTIONS</th>
         </thead>
-
         {% for val in wish_list %}
             <tr>
                 {% for v in val %}
                     <td>{{ v }}</td>
                 {% endfor %}
-                <td><a href="/update/{{ val.id }}">Update</a>&nbsp;&nbsp;&nbsp;<a href="/delete/{{ val.id }}">Delete</a>
+                <td><a href="/update/{{ val.id }}/">Update</a>&nbsp;&nbsp;&nbsp;<a href="/delete/{{ val.id }}/">Delete</a>
                 </td>
             </tr>
         {% endfor %}
-
     </table>
-    <br>
     <a href="/wishinsert/" type="submit" class="btn btn-success btn-lg align-right">INSERT</a>
 {% else %}
     <h3>No wishes found</h3>
 {% endif %}
+<br><br>
 {% include "htmlfiles/pagination.html" with page=wish_list %}
 </body>
 </html>

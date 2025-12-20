@@ -24,7 +24,7 @@ class contacus(models.Model):
     #created_time = models.DateTimeField(default=timezone.now)
     created_date=models.DateTimeField(auto_now_add=True)
     #objects=customManager() #this is how we can use custom manager to sort the records based on created date in descending order
-    class Meta:
+    class Meta: #this is how we can use meta class to define the ordering of the records or meta can be used to define other things like verbose name, db table name etc.
         ordering = ('-created_date',)  #WE CAN SORT THE RECORDS BASED ON CREATED DATE IN DESCENDING ORDER USING THIS INSTEAD OF WRITING CUSTOM MANAGER
 
 
@@ -42,6 +42,9 @@ class aboutdetails(models.Model):
     def __str__(self):
         return self.title
 
+#this method is for returning the string representation of the object (i.e. in layman words it returns the title of the aboutdetails object instead of the object memory location
+# for example in realworld if we have multiple aboutdetails objects and we want to see the list of all aboutdetails objects in the admin panel or in the shell then instead of showing the memory location of each object it will show the title of each object which is more meaningful to us)
+
     def get_absolute_url(self):
          return reverse('aboutdetail',args=[self.slug])
 
@@ -49,7 +52,7 @@ class aboutdetails(models.Model):
 
 
 """------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"""
-# THE BELOW MODEL IS A TEMPORARY MODEL TO STORE THE WISH DATA FOR MY PRACTICE
+                                            # THE BELOW MODEL IS A TEMPORARY MODEL TO STORE THE WISH DATA FOR MY PRACTICE
 
 class loginFormdata(models.Model):
     loginemail=models.CharField(max_length=100)
@@ -64,3 +67,18 @@ class wishdata(models.Model):
     def get_absolute_url(self):
         return reverse('wishdetail',kwargs={'pk':self.pk})
 
+class author(models.Model):
+    authorname = models.CharField(max_length=100)
+    age = models.IntegerField()
+    location = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.authorname
+
+class book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(author, on_delete=models.CASCADE,related_name='books_by_author')
+    published_date = models.DateField()
+
+    def __str__(self):
+        return self.title
