@@ -15,13 +15,12 @@ import oracle_patch
 import os
 import environ
 
-BASE_DIR = Path(
-    __file__).resolve().parent.parent  # project base directory path __file__ refers to current file path (settings.py) .resolve() gives absolute path .parent.parent goes two levels up to project root
+BASE_DIR = Path(__file__).resolve().parent.parent  # project base directory path __file__ refers to current file path (settings.py) .resolve() gives absolute path .parent.parent goes two levels up to project root
 env = environ.Env(DEBUG=(bool, False))
 env.read_env(os.path.join(str(BASE_DIR), '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = BASE_DIR / 'templates'
 STATIC_DIR = BASE_DIR / 'static'
 
@@ -47,6 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_spectacular',
+    'rest_framework.authtoken',
+
     'webapp',
     'taggit'
 ]
@@ -59,8 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'webapp.middleware.ExecutionFlowMiddleware'
-    #'whitenoise.middleware.WhiteNoiseMiddleware'
+    # 'webapp.middleware.ExecutionFlowMiddleware'
+    # 'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'webProject.urls'
@@ -86,12 +89,25 @@ WSGI_APPLICATION = 'webProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': env('DB_ENGINE'),
+#         'NAME': env('DB_NAME'),
+#         'USER': env('DB_USER'),
+#         'PASSWORD': env('DB_PASSWORD'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': env("DB_ENGINE"),  # 'django.db.backends.oracle'
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
+    },
+    'oracle': {  # TEMPORARY ORACLE CONNECTION
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'localhost:1521/xepdb1',
+        'USER': 'system',
+        'PASSWORD': '9441279267',
     }
 }
 
@@ -140,6 +156,12 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
+
+JWT_AUTH_CONFIG = {
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_HEADER_PREFIX': 'Bearer',
+}
+
 # Directory where static files will be collected in production
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -154,12 +176,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Default login and logout redirect URLs and session settings
 
 LOGIN_URL = '/loginpage/'
-LOGIN_REDIRECT_URL = '/home/'
+LOGIN_REDIRECT_URL = '/apimodelviewset/'
 LOGOUT_REDIRECT_URL = '/loginpage/'
 SESSION_SAVE_EVERY_REQUEST = True  # refresh session timeout on each page view
 SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE", default=3600)  # Session will expire in 1 hour (3600 seconds)
-SESSION_EXPIRE_AT_BROWSER_CLOSE = env(
-    "SESSION_EXPIRE_AT_BROWSER_CLOSE")  # user is logged out when they close their browser even before 1 hour.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = env("SESSION_EXPIRE_AT_BROWSER_CLOSE")  # user is logged out when they close their browser even before 1 hour.
 
 # Email backend configuration for development (console backend)
 # Looking to send emails in production? Check out our Email API/SMTP product!
@@ -180,3 +201,24 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     X_FRAME_OPTIONS = "DENY"
+
+                                            #================REST Framework global settings===================================
+REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication',],
+#     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],
+      #'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+      #'PAGE_SIZE': 15,
+     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.SearchFilter','rest_framework.filters.OrderingFilter'),
+     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My API',
+    'DESCRIPTION': 'API documentation for my Django project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+
+    # Optional but useful
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
+}

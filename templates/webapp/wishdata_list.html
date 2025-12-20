@@ -54,6 +54,8 @@
     {% else %}
         <h3>No wishes found</h3>
 {% endif %}
+<br><br>
+{% include "htmlfiles/pagination.html" with page=page_obj %}
 </body>
 </html>
 

@@ -21,9 +21,6 @@ admin.site.register(aboutdetails,aboutDetailsAdmin)
 
 
 
-
-
-
 """------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 #THE BELOW MODEL IS A TEMPORARY MODEL TO STORE THE WISH DATA FOR MY PRACTICE
@@ -32,3 +29,14 @@ admin.site.register(aboutdetails,aboutDetailsAdmin)
 class wishdataAdmin(admin.ModelAdmin):
     list_display = ['id','username','name','astrology_message','mobilenumber']
 admin.site.register(wishdata,wishdataAdmin)
+
+
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ['id','authorname','age','location']
+admin.site.register(author,AuthorAdmin)
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ['id','title','author','published_date']
+    list_filter = ['author']
+    search_fields = ('title',)
+admin.site.register(book,BookAdmin)
