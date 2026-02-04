@@ -434,8 +434,8 @@ class wishdetailview(DetailView):
     # default context object: wishdata(modelclassname) or object
 
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# -----------------BELOW IS THE CODE FOR MY PRACTICE PURPOSE ONLY: DJANGO [REST API] THIS BELOW SECTION IS WITHOUT REST API -----------------------------
+# ------------------------------------------------------------------REST API----------------------------------------------------------------------------------------------------------
+                # -----------------BELOW IS THE CODE FOR MY PRACTICE PURPOSE ONLY: DJANGO [REST API] THIS BELOW SECTION IS WITHOUT REST API -----------------------------
 
 from webapp.mixin import *
 from webapp.utils import *
@@ -451,11 +451,9 @@ def wish_api_view1(request):
 
 
 def wish_api_view2(request):
-    wish_list = wishdata.objects.all().values('id', 'username', 'name', 'astrology_message',
-                                              'mobilenumber')  # Fetch all wishdata records as dictionaries i.e.queryset of dictionaries
+    wish_list = wishdata.objects.all().values('id', 'username', 'name', 'astrology_message','mobilenumber')  # Fetch all wishdata records as dictionaries i.e.queryset of dictionaries
     wish_data = list(wish_list)  # Convert QuerySet to a list of dictionaries
-    return JsonResponse(wish_data, safe=False, content_type="application/json",
-                        json_dumps_params={'indent': 4})  # Return as JSON response with indentation for readability
+    return JsonResponse(wish_data, safe=False, content_type="application/json",json_dumps_params={'indent': 4})  # Return as JSON response with indentation for readability
 
 
 # ------------------------------------------------------ #delete,get,post using mixin and put using normal httpresponse----------------------------------------------------
@@ -960,7 +958,7 @@ class DRFModelViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated] #custom permission class defined in custompermission.py file
 
 
-
+#------------------------------------------ CONSUMING 3RD PARTY PUBLIC API USING DJANGO VIEW -------------------------------------------------------------
 
 
 

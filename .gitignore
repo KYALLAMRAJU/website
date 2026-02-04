@@ -1,3 +1,8 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -6,11 +11,15 @@ __pycache__/
 .env.prod
 venv/
 .venv/
+*.pyc
+*.pyo
+*.pyd
 
 # Django
 db.sqlite3
 media/
 staticfiles/
+*.log
 
 # IDE
 .idea/
@@ -19,3 +28,7 @@ staticfiles/
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment variables
+.env
+.env.*

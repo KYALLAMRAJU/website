@@ -1,6 +1,6 @@
 import requests,json
 BASE_URL='http://127.0.0.1:8000/'
-ENDPOINT='apipy/'
+ENDPOINT='api/crudcbv/'
 
 def get_resource():
     while(True):

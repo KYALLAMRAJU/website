@@ -100,7 +100,8 @@ urlpatterns = [
     path('api/wishlistcbvwr/<int:id>/',views.jsonCBV.as_view(),name="wishlist-detail"),
     path('api/wishlistcbv1wr/',views.jsonCBV1.as_view()),
     path('api/wishlistcbv2wr/',views.jsonCBV2.as_view()),
-    path('api/crudcbv', views.DRFCRUDCBV.as_view()),
+    path('api/crudcbv/', views.crudCBV.as_view()),
+    path('api/drfcrudcbv/', views.DRFCRUDCBV.as_view()),
     path('api/wishserializemetawr/',views.serializemetaCBV.as_view()),
     path('api/wishlistserializewr/',views.serializesingleCBV.as_view()),
 
