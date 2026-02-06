@@ -6,6 +6,7 @@ __pycache__/
 .env.prod
 venv/
 .venv/
+.pyc
 
 # Django
 db.sqlite3
