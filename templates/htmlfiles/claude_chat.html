@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Claude Test</title>
+{% endblock %}
+{% block childcode_block %}
+<h1>Claude Test</h1>
+<textarea id="prompt"></textarea>
+<button onclick="ask()">Send</button>
+<div id="result"></div>
+<script>
+async function ask(){
+
+ const p = document.getElementById("prompt").value;
+
+ const r = await fetch("/api/claude/", {
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({prompt:p})
+ });
+
+ const d = await r.json();
+
+ document.getElementById("result").innerText =
+      d.response;
+}
+</script>
+
+{% endblock %}
