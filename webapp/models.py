@@ -49,23 +49,9 @@ class aboutdetails(models.Model):
          return reverse('aboutdetail',args=[self.slug])
 
 
-
-
-"""------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"""
-                                            # THE BELOW MODEL IS A TEMPORARY MODEL TO STORE THE WISH DATA FOR MY PRACTICE
-
 class loginFormdata(models.Model):
     loginemail=models.CharField(max_length=100)
     loginpassword=models.CharField(max_length=100)
-
-class wishdata(models.Model):
-    username=models.CharField(max_length=100)
-    name=models.CharField(max_length=100)
-    astrology_message=models.CharField(max_length=300)
-    mobilenumber=models.BigIntegerField(default=0)
-
-    def get_absolute_url(self):
-        return reverse('wishdetail',kwargs={'pk':self.pk})
 
 class author(models.Model):
     authorname = models.CharField(max_length=100)
@@ -82,3 +68,14 @@ class book(models.Model):
 
     def __str__(self):
         return self.title
+
+"""------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"""
+                                            # THE BELOW MODEL IS A TEMPORARY MODEL TO STORE THE WISH DATA FOR MY PRACTICE
+class wishdata(models.Model):
+    username=models.CharField(max_length=100)
+    name=models.CharField(max_length=100)
+    astrology_message=models.CharField(max_length=300)
+    mobilenumber=models.BigIntegerField(default=0)
+
+    def get_absolute_url(self):
+        return reverse('wishdetail',kwargs={'pk':self.pk})

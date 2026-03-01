@@ -8,14 +8,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="{% static 'css/home.css' %}"/>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 
-    <!-- Hide Google banner and logo -->
+    <!-- Hide Google banner and customize translate widget -->
     <style>
-        .goog-te-banner-frame.skiptranslate {
+        /* Hide the Google Translate top banner completely */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-banner-frame {
             display: none !important;
+            visibility: hidden !important;
         }
 
         body {
+            top: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        /* Prevent Google Translate from pushing the body down */
+        body.translated-ltr,
+        body.translated-rtl {
+            margin-top: 0 !important;
             top: 0 !important;
         }
 
@@ -24,13 +37,106 @@
         }
 
         .goog-te-gadget {
-            font-size: 0 !important;
+            font-size: 0.9rem !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         }
 
         .goog-te-gadget .goog-te-combo {
             font-size: 0.9rem !important;
-            padding: 2px 6px;
+            padding: 6px 10px !important;
+            border-radius: 6px !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+
+        .goog-te-gadget-simple .goog-te-combo {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .goog-te-gadget img {
+            display: none !important;
+        }
+
+        /* Hide the "Powered by" text */
+        .goog-te-gadget .goog-te-gadget-simple {
+            background-color: transparent !important;
+            border: none !important;
+        }
+
+        .goog-te-gadget .goog-te-gadget-link {
+            display: none !important;
+        }
+
+        /* Language selector dropdown styling */
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .language-dropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
             border-radius: 6px;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-dropdown a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .language-dropdown a:hover {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .language-dropdown a.active {
+            background-color: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .language-dropdown a i {
+            margin-right: 8px;
+            width: 20px;
+        }
+
+        .lang-btn {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important;
+            border: none !important;
+            color: #1a1a1a !important;
+            padding: 6px 14px !important;
+            border-radius: 50px !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 3px 10px rgba(253, 160, 133, 0.5) !important;
+            letter-spacing: 0.3px !important;
+        }
+
+        .lang-btn:hover {
+            background: linear-gradient(135deg, #fda085 0%, #f6d365 100%) !important;
+            transform: scale(1.07) !important;
+            box-shadow: 0 5px 15px rgba(253, 160, 133, 0.7) !important;
+        }
+
+        .lang-btn .fa-globe {
+            color: #7b3f00 !important;
         }
     </style>
 </head>
@@ -59,9 +165,25 @@
                        style="cursor:pointer;">Contact</a>
                 </li>
 
-                <!-- ⭐ GOOGLE TRANSLATE WIDGET IN NAVBAR ⭐ -->
+                <!-- ⭐ AUTOMATIC LANGUAGE SELECTOR ⭐ -->
                 <li class="nav-item ms-2">
-                    <div id="google_translate_element_nav"></div>
+                    <div class="language-selector">
+                        <button class="lang-btn" id="langBtn" onclick="toggleLanguageDropdown()">
+                            <i class="fas fa-globe me-1"></i> <span id="currentLang">English</span> <i class="fas fa-chevron-down ms-1" style="font-size:0.7rem;"></i>
+                        </button>
+                        <div class="language-dropdown" id="languageDropdown">
+                            <a href="#" onclick="changeLanguage('en'); return false;"><i class="fas fa-check"></i> English</a>
+                            <a href="#" onclick="changeLanguage('te'); return false;"><i class="fas fa-book"></i> Telugu</a>
+                            <a href="#" onclick="changeLanguage('hi'); return false;"><i class="fas fa-book"></i> Hindi</a>
+                            <a href="#" onclick="changeLanguage('ta'); return false;"><i class="fas fa-book"></i> Tamil</a>
+                            <a href="#" onclick="changeLanguage('ka'); return false;"><i class="fas fa-book"></i> Kannada</a>
+                            <a href="#" onclick="changeLanguage('es'); return false;"><i class="fas fa-book"></i> Spanish</a>
+                            <a href="#" onclick="changeLanguage('fr'); return false;"><i class="fas fa-book"></i> French</a>
+                            <a href="#" onclick="changeLanguage('de'); return false;"><i class="fas fa-book"></i> German</a>
+                            <a href="#" onclick="changeLanguage('zh-CN'); return false;"><i class="fas fa-book"></i> Chinese</a>
+                            <a href="#" onclick="changeLanguage('ja'); return false;"><i class="fas fa-book"></i> Japanese</a>
+                        </div>
+                    </div>
                 </li>
 
                 <li class="nav-item dropdown ms-2">
@@ -102,9 +224,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form method="POST" action="/contact-submit/">
+            <form id="contactForm">
                 {% csrf_token %}
                 <div class="modal-body">
+                    <!-- Alert box for inline feedback -->
+                    <div id="contactAlert" class="alert d-none mb-3" role="alert"></div>
+
                     <div class="mb-3">
                         <label class="form-label">Name</label>
                         <input type="text" class="form-control"
@@ -128,7 +253,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                    <button type="submit" id="contactSubmitBtn" class="btn btn-primary w-100">Submit</button>
                 </div>
             </form>
 
@@ -136,23 +261,501 @@
     </div>
 </div>
 
-<!-- JS Dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function (e) {
+        e.preventDefault();
 
-<!-- GOOGLE TRANSLATE: SIMPLE OFFICIAL INTEGRATION -->
-<script type="text/javascript">
+        const form = this;
+        const btn = document.getElementById('contactSubmitBtn');
+        const alert = document.getElementById('contactAlert');
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Reset alert
+        alert.className = 'alert d-none mb-3';
+        alert.textContent = '';
+
+        // Disable button while sending
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+        const data = new FormData();
+        data.append('csrfmiddlewaretoken', csrfToken);
+        data.append('subject', form.querySelector('[name=subject]').value);
+        data.append('message', form.querySelector('[name=message]').value);
+
+        fetch('/contact-submit/', {
+            method: 'POST',
+            body: data,
+            credentials: 'same-origin'
+        })
+        .then(function (res) { return res.json().then(function(d){ return {ok: res.ok, data: d}; }); })
+        .then(function (result) {
+            if (result.ok) {
+                alert.className = 'alert alert-success mb-3';
+                alert.textContent = result.data.message;
+                form.querySelector('[name=subject]').value = '';
+                form.querySelector('[name=message]').value = '';
+                // Close modal after 2 seconds on success
+                setTimeout(function () {
+                    bootstrap.Modal.getInstance(document.getElementById('contactModal')).hide();
+                    alert.className = 'alert d-none mb-3';
+                }, 2000);
+            } else {
+                alert.className = 'alert alert-danger mb-3';
+                alert.textContent = result.data.message || 'Something went wrong. Please try again.';
+            }
+        })
+        .catch(function () {
+            alert.className = 'alert alert-danger mb-3';
+            alert.textContent = 'Network error. Please check your connection and try again.';
+        })
+        .finally(function () {
+            btn.disabled = false;
+            btn.innerHTML = 'Submit';
+        });
+    });
+</script>
+
+<!-- Language Switching Script (Fast Batch Translation) -->
+<script>
+    // Clear old broken translation state from previous implementations
+    if (!localStorage.getItem('translatorVersion') || localStorage.getItem('translatorVersion') !== 'v4') {
+        localStorage.removeItem('selectedLanguage');
+        localStorage.removeItem('selectedLanguageName');
+        localStorage.setItem('translatorVersion', 'v4');
+    }
+
+    const languageNames = {
+        'en': 'English', 'te': 'Telugu', 'hi': 'Hindi', 'ta': 'Tamil',
+        'kn': 'Kannada', 'es': 'Spanish', 'fr': 'French',
+        'de': 'German', 'zh-CN': 'Chinese', 'ja': 'Japanese'
+    };
+
+    const langCodeMap = {
+        'en': 'en', 'te': 'te', 'hi': 'hi', 'ta': 'ta',
+        'ka': 'kn', 'es': 'es', 'fr': 'fr',
+        'de': 'de', 'zh-CN': 'zh-CN', 'ja': 'ja'
+    };
+
+    // Forcefully keep body at top:0 at all times (Google Translate moves it)
+    function fixBodyPosition() {
+        document.body.style.top = '0px';
+        document.body.style.marginTop = '0px';
+    }
+
+    // Observe body style changes and fix immediately
+    const bodyObserver = new MutationObserver(fixBodyPosition);
+    bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+
+    // Also hide any banner that appears dynamically
+    const bannerObserver = new MutationObserver(function() {
+        const banners = document.querySelectorAll('.goog-te-banner-frame, .skiptranslate iframe');
+        banners.forEach(b => { b.style.display = 'none'; b.style.visibility = 'hidden'; });
+        fixBodyPosition();
+    });
+    bannerObserver.observe(document.body, { childList: true, subtree: true });
+
+    // Called by Google Translate script on load
     function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,te',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, 'google_translate_element_nav');
+        new google.translate.TranslateElement(
+            { pageLanguage: 'en', autoDisplay: false },
+            'google_translate_element'
+        );
+        // After widget loads, apply saved language
+        const savedLang = localStorage.getItem('selectedLanguage');
+        const savedName = localStorage.getItem('selectedLanguageName');
+        if (savedLang && savedLang !== 'en' && savedName) {
+            document.getElementById('currentLang').textContent = savedName;
+            setTimeout(() => applyGoogleTranslate(langCodeMap[savedLang] || savedLang), 500);
+        }
+    }
+
+    function toggleLanguageDropdown() {
+        document.getElementById('languageDropdown').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function (e) {
+        const selector = document.querySelector('.language-selector');
+        if (selector && !selector.contains(e.target)) {
+            document.getElementById('languageDropdown').classList.remove('show');
+        }
+    });
+
+    function applyGoogleTranslate(googleLangCode) {
+        const select = document.querySelector('.goog-te-combo');
+        if (select) {
+            select.value = googleLangCode;
+            select.dispatchEvent(new Event('change'));
+            // Fix body position after translation is triggered
+            setTimeout(fixBodyPosition, 200);
+            setTimeout(fixBodyPosition, 800);
+        } else {
+            // Retry if widget hasn't loaded yet
+            setTimeout(() => applyGoogleTranslate(googleLangCode), 300);
+        }
+    }
+
+    function changeLanguage(lang) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+
+        const displayName = languageNames[lang] || languageNames[langCodeMap[lang]] || lang;
+        document.getElementById('currentLang').textContent = displayName;
+        document.getElementById('languageDropdown').classList.remove('show');
+
+        if (lang === 'en') {
+            localStorage.removeItem('selectedLanguage');
+            localStorage.removeItem('selectedLanguageName');
+            // Use the combo to switch back to English — no page reload
+            applyGoogleTranslate('en');
+        } else {
+            localStorage.setItem('selectedLanguage', lang);
+            localStorage.setItem('selectedLanguageName', displayName);
+            applyGoogleTranslate(langCodeMap[lang] || lang);
+        }
     }
 </script>
+
+<!-- Hidden Google Translate widget -->
+<div id="google_translate_element" style="display:none; visibility:hidden;"></div>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+
+<!-- ============ CLAUDE AI FLOATING CHAT ============ -->
+<button onclick="openClaude()"
+        class="btn btn-primary shadow"
+        style="
+        position:fixed;
+        bottom:25px;
+        right:25px;
+        z-index:9999;
+        border-radius:30px;
+        padding:10px 16px;">
+    <i class="fa-solid fa-robot me-1"></i> Ask AI
+</button>
+
+<div id="claudeBox"
+     class="shadow"
+     style="
+     display:none;
+     position:fixed;
+     bottom:80px;
+     right:25px;
+     width:380px;
+     background:#ece5dd;
+     border-radius:10px;
+     z-index:9999;">
+
+    <!-- HEADER -->
+    <div class="p-2 text-white"
+         style="background:#075E54; border-radius:10px 10px 0 0;">
+        <div class="d-flex justify-content-between">
+            <b>Vedanta AI</b>
+            <span style="cursor:pointer" onclick="closeClaude()">✖</span>
+        </div>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div id="chatArea"
+         style="
+         height:320px;
+         overflow-y:auto;
+         padding:10px;">
+    </div>
+
+    <!-- INPUT AREA -->
+    <div class="p-2 bg-light d-flex">
+        <input id="prompt"
+               class="form-control me-2"
+               placeholder="Type message..."/>
+        <button class="btn text-white"
+                style="background:#128C7E"
+                onclick="askClaude()">
+            <i class="fa fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<style>
+    .user-bubble {
+        background: #dcf8c6;
+        padding: 8px 10px;
+        border-radius: 10px;
+        margin: 5px;
+        max-width: 80%;
+        margin-left: auto;
+    }
+
+    .ai-bubble {
+        background: white;
+        padding: 8px 10px;
+        border-radius: 10px;
+        margin: 5px;
+        max-width: 80%;
+    }
+
+    .time {
+        font-size: 10px;
+        color: gray;
+        text-align: right;
+    }
+</style>
+
+<script>
+    function openClaude() {
+        document.getElementById("claudeBox").style.display = "block";
+    }
+
+    function closeClaude() {
+        document.getElementById("claudeBox").style.display = "none";
+    }
+
+    function addUserBubble(text) {
+        const chat = document.getElementById("chatArea");
+        chat.innerHTML += `
+   <div class="user-bubble">
+      ${text}
+      <div class="time">You</div>
+   </div>
+ `;
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function addAIBubble(text) {
+        const chat = document.getElementById("chatArea");
+        chat.innerHTML += `
+   <div class="ai-bubble">
+      ${text}
+      <div class="time">AI</div>
+   </div>
+ `;
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function askClaude() {
+        const input = document.getElementById("prompt");
+        const p = input.value;
+
+        if (!p) return;
+
+        addUserBubble(p);
+        input.value = "";
+        addAIBubble("typing...");
+
+        const r = await fetch("/api/claude/", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({prompt: p})
+        });
+
+        const d = await r.json();
+        const chat = document.getElementById("chatArea");
+        chat.removeChild(chat.lastElementChild);
+        addAIBubble(d.response);
+    }
+</script>
+
+<!-- ============================================================ -->
+<!-- SESSION EXPIRY WARNING MODAL                                  -->
+<!-- ============================================================ -->
+<div id="sessionWarningModal"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55);
+            z-index:99999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:16px; width:92%; max-width:420px;
+                box-shadow:0 20px 60px rgba(0,0,0,0.35); overflow:hidden; animation: slideUp 0.3s ease;">
+
+        <!-- Modal Header -->
+        <div style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);
+                    padding:20px 24px; display:flex; align-items:center; gap:12px;">
+            <div style="background:rgba(255,255,255,0.25); border-radius:50%;
+                        width:42px; height:42px; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-clock" style="color:#fff; font-size:1.2rem;"></i>
+            </div>
+            <div>
+                <div style="color:#fff; font-size:1.1rem; font-weight:700;">Session Expiring Soon</div>
+                <div style="color:rgba(255,255,255,0.85); font-size:0.82rem;">Your session is about to time out</div>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div style="padding:24px;">
+            <p style="color:#444; font-size:0.95rem; margin-bottom:6px; text-align:center;">
+                You will be automatically logged out in
+            </p>
+            <div style="text-align:center; margin:10px 0 20px;">
+                <span id="sessionCountdown"
+                      style="font-size:2.8rem; font-weight:800;
+                             background:linear-gradient(135deg,#ff6b6b,#ee5a24);
+                             -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+                             background-clip:text;">
+                    2:00
+                </span>
+                <div style="color:#888; font-size:0.8rem; margin-top:2px;">minutes remaining</div>
+            </div>
+
+            <!-- Progress bar -->
+            <div style="background:#f0f0f0; border-radius:50px; height:6px; margin-bottom:22px; overflow:hidden;">
+                <div id="sessionProgressBar"
+                     style="background:linear-gradient(90deg,#ff6b6b,#ee5a24);
+                            height:100%; width:100%; border-radius:50px;
+                            transition:width 1s linear;"></div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display:flex; gap:12px;">
+                <button onclick="extendSession()"
+                        style="flex:1; padding:12px; border:none; border-radius:10px;
+                               background:linear-gradient(135deg,#667eea,#764ba2);
+                               color:#fff; font-size:0.95rem; font-weight:600;
+                               cursor:pointer; transition:opacity 0.2s;"
+                        onmouseover="this.style.opacity='0.88'"
+                        onmouseout="this.style.opacity='1'">
+                    <i class="fas fa-refresh me-1"></i> Stay Logged In
+                </button>
+                <button onclick="logoutNow()"
+                        style="flex:1; padding:12px; border:2px solid #ee5a24; border-radius:10px;
+                               background:#fff; color:#ee5a24; font-size:0.95rem; font-weight:600;
+                               cursor:pointer; transition:all 0.2s;"
+                        onmouseover="this.style.background='#fff3f0'"
+                        onmouseout="this.style.background='#fff'">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout Now
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideUp {
+        from { transform: translateY(40px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+    }
+</style>
+
+<script>
+    (function () {
+        // ── Configuration ───────────────────────────────────────────────────────
+        const SESSION_DURATION_MS  = 60 * 60 * 1000;    // ⚠️ TESTING: 5 min (change to 60 * 60 * 1000 for production)
+        const WARNING_BEFORE_MS    = 2 * 60 * 1000;    // ⚠️ TESTING: warn 1 min before (change to 2 * 60 * 1000 for production)
+        const COUNTDOWN_SECONDS    = WARNING_BEFORE_MS / 1000;  // 120 s
+
+        // ── State ────────────────────────────────────────────────────────────────
+        let warningTimer    = null;
+        let countdownTimer  = null;
+        let secondsLeft     = COUNTDOWN_SECONDS;
+        let lastActivityTime = Date.now();
+
+        // ── Helpers ──────────────────────────────────────────────────────────────
+        function getCsrfToken() {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            if (meta) return meta.getAttribute('content');
+            const match = document.cookie.match(/csrftoken=([^;]+)/);
+            return match ? match[1] : '';
+        }
+
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return m + ':' + String(s).padStart(2, '0');
+        }
+
+        function showModal() {
+            const modal = document.getElementById('sessionWarningModal');
+            modal.style.display = 'flex';
+        }
+
+        function hideModal() {
+            const modal = document.getElementById('sessionWarningModal');
+            modal.style.display = 'none';
+        }
+
+        // ── Countdown inside the modal ───────────────────────────────────────────
+        function startCountdown() {
+            secondsLeft = COUNTDOWN_SECONDS;
+            document.getElementById('sessionCountdown').textContent = formatTime(secondsLeft);
+            document.getElementById('sessionProgressBar').style.width = '100%';
+
+            clearInterval(countdownTimer);
+            countdownTimer = setInterval(function () {
+                secondsLeft--;
+                document.getElementById('sessionCountdown').textContent = formatTime(secondsLeft);
+
+                const pct = (secondsLeft / COUNTDOWN_SECONDS) * 100;
+                document.getElementById('sessionProgressBar').style.width = pct + '%';
+
+                // change bar colour when critical (≤ 30 s)
+                if (secondsLeft <= 30) {
+                    document.getElementById('sessionProgressBar').style.background = '#ee5a24';
+                }
+
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    hideModal();
+                    window.location.href = '/loginpage/?next=' + encodeURIComponent(window.location.pathname);
+                }
+            }, 1000);
+        }
+
+        // ── Schedule the warning popup ───────────────────────────────────────────
+        function scheduleWarning() {
+            clearTimeout(warningTimer);
+            const delay = SESSION_DURATION_MS - WARNING_BEFORE_MS;
+            warningTimer = setTimeout(function () {
+                showModal();
+                startCountdown();
+            }, delay);
+        }
+
+        // ── Reset timer on user activity ─────────────────────────────────────────
+        function resetActivityTimer() {
+            lastActivityTime = Date.now();
+            // Only reschedule if modal is not already showing
+            const modal = document.getElementById('sessionWarningModal');
+            if (modal && modal.style.display === 'none') {
+                scheduleWarning();
+            }
+        }
+
+        ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(function (evt) {
+            document.addEventListener(evt, resetActivityTimer, { passive: true });
+        });
+
+        // ── Extend session button ─────────────────────────────────────────────────
+        window.extendSession = function () {
+            fetch('/session-ping/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                credentials: 'same-origin'
+            })
+            .then(function (res) {
+                if (res.ok) {
+                    clearInterval(countdownTimer);
+                    hideModal();
+                    scheduleWarning();   // restart the full 1-hour countdown
+                } else {
+                    // Session already expired on server — redirect
+                    window.location.href = '/loginpage/';
+                }
+            })
+            .catch(function () {
+                window.location.href = '/loginpage/';
+            });
+        };
+
+        // ── Logout button ─────────────────────────────────────────────────────────
+        window.logoutNow = function () {
+            clearInterval(countdownTimer);
+            clearTimeout(warningTimer);
+            hideModal();
+            window.location.href = '/loginpage/';
+        };
+
+        // ── Kick off on page load ─────────────────────────────────────────────────
+        scheduleWarning();
+    })();
+</script>
 </body>
 </html>

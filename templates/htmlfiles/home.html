@@ -7,60 +7,6 @@
 {% endblock %}
 
 {% block childcode_block %}
-    {% if messages %}
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                {% for message in messages %}
-                    let titleText = "";
-                    let iconType = "";
-                    let msgText = "{{ message }}";
-
-                    // 🔹 Determine title/icon based on tag
-                    {% if message.tags == "success" %}
-                        // Distinguish login vs mail success
-                        if (msgText.includes("Welcome back")) {
-                            titleText = "👋 Welcome Back!";
-                        } else if (msgText.includes("request has been sent")) {
-                            titleText = "📧 Query Sent!";
-                        } else {
-                            titleText = "👋 Welcome Back!";
-                        }
-                        iconType = "success";
-
-                    {% elif message.tags == "error" %}
-                        titleText = "⚠️ Error!";
-                        iconType = "error";
-
-                    {% elif message.tags == "info" %}
-                        titleText = "ℹ️ Info";
-                        iconType = "info";
-
-                    {% else %}
-                        titleText = "🔔 Notice";
-                        iconType = "info";
-                    {% endif %}
-
-                    Swal.fire({
-                        title: titleText,
-                        text: msgText,
-                        icon: iconType,
-                        timer: 4000,
-                        showConfirmButton: false,
-                        background: "#fdfdfd",
-                        color: "#333",
-                        position: "center",
-                        timerProgressBar: true,
-                        customClass: {popup: "swal2-rounded"},
-                        didOpen: (popup) => {
-                            popup.style.borderRadius = "20px";
-                            popup.style.boxShadow = "0 0 15px rgba(0, 0, 0, 0.15)";
-                        }
-                    });
-                {% endfor %}
-            });
-        </script>
-    {% endif %}
 
     <!-- 🏡 Hero Section -->
     <header class="hero-section text-center text-white d-flex align-items-center justify-content-center">

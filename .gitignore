@@ -1,22 +1,143 @@
-# Python
+# ============================================================
+# .gitignore for Advaitam Django Project
+# ============================================================
+
+# ========== PYTHON ==========
 __pycache__/
+*/__pycache__/
+**/__pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+*.egg
 *.egg-info/
-.env
-.env.prod
+.eggs/
+
+# ========== VIRTUAL ENVIRONMENTS ==========
 venv/
 .venv/
-.pyc
+env/
+.env_dir/
 
-# Django
+# ========== ENVIRONMENT / SECRET FILES ==========
+# NEVER commit real secrets to Git
+.env
+.env.production
+.env.production.bak
+.env.local
+.env.*.local
+.env.local.py
+
+# ========== DJANGO ==========
 db.sqlite3
+identifier.sqlite
+*.sqlite3
+*.db
 media/
 staticfiles/
+logs/
+logs/*.log
+logs/gunicorn_*.log
+logs/nginx_*.log
+*.log
+mydatabase
 
-# IDE
+# ========== DEPLOYMENT TEMPLATES (keep deploy/ folder but not the template) ==========
+deploy/06-TEMPLATES/.env.prod.template
+
+# ========== TEMPORARY / DEV-ONLY SCRIPTS ==========
+write_settings.py
+fakerdata.py
+oracle_patch.py
+copy_oracle_to_sqlite.py
+test.py
+test_config.py
+setup-dev.sh
+
+# ========== IDE ==========
+# PyCharm
 .idea/
-.vscode/
+*.iml
+*.iws
+*.ipr
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries/
+.idea/shelf/
+.idea/aws.xml
+.idea/httpRequests/
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
 
-# OS
+# VSCode
+.vscode/
+.vscode/settings.json
+
+# Other editors
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ========== OS ==========
 .DS_Store
 Thumbs.db
+.directory
+desktop.ini
+
+# ========== TESTING & COVERAGE ==========
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+*.cover
+.hypothesis/
+nosetests.xml
+coverage.xml
+test-results/
+junit.xml
+
+# ========== TEMPORARY / CACHE ==========
+*.tmp
+*.temp
+*.cache
+.cache/
+*.bak
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ========== BUILD & DISTRIBUTION ==========
+build/
+dist/
+*.egg-info/
+*.whl
+*.wheels/
+
+# ========== AUDIO FILES (large binaries — upload to S3 directly, never commit) ==========
+*.mp3
+*.mp4
+*.wav
+*.ogg
+*.flac
+static/audio/**/*.mp3
+
+# ========== LOCAL DOCUMENTATION (dev-only .md notes, not for repo) ==========
+static/audio/audio-connection-guide.md
+static/audio/audio-html-js-deep-dive.md
+
+# ========== SECRETS & KEYS ==========
+*.pem
+*.key
+*.ppk
+KEYPAIR*
+*.p12
+*.pfx

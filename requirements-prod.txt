@@ -1,0 +1,46 @@
+# ========== CORE DJANGO ==========
+Django==5.2.9
+django-environ==0.12.0
+
+# ========== DATABASE ==========
+psycopg2-binary==2.9.9
+
+# ========== REST API ==========
+djangorestframework==3.16.1
+django-filter==25.2
+drf-spectacular==0.29.0
+
+# ========== AUTHENTICATION ==========
+djangorestframework-simplejwt==5.5.1
+
+# ========== STORAGE ==========
+django-storages==1.14.6
+boto3==1.42.52
+
+# ========== TAGGING ==========
+django-taggit==6.1.0
+
+# ========== SERVER ==========
+gunicorn==23.0.0
+whitenoise==6.11.0
+
+# ========== API & AI ==========
+anthropic==0.78.0
+
+# ========== PASSWORD HASHING ==========
+argon2-cffi==23.1.0
+
+# ========== UTILITIES ==========
+requests==2.32.4
+python-dateutil==2.9.0
+pytz==2025.2
+
+# ========== ERROR TRACKING ==========
+sentry-sdk==2.52.0
+
+# ========== MONITORING ==========
+django-cors-headers==4.3.1
+
+# ========== CACHING (ElastiCache / Redis) ==========
+redis==5.0.8
+django-redis==5.4.0

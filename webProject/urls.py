@@ -24,8 +24,6 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path("", include('webapp.urls')),
-    path('api-auth/', include('rest_framework.urls'))
-
 
     # path('accounts/', include('django.contrib.auth.urls')),
     # ✅ Force Django to use your custom login page
@@ -33,4 +31,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # DRF browsable API login/logout — only needed locally
+    urlpatterns += [path('api-auth/', include('rest_framework.urls'))]
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
