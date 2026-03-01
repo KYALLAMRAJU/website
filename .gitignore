@@ -42,8 +42,8 @@ logs/nginx_*.log
 *.log
 mydatabase
 
-# ========== DEPLOYMENT TEMPLATES (keep deploy/ folder but not the template) ==========
-deploy/06-TEMPLATES/.env.prod.template
+# ========== DEPLOYMENT / DOCS (local only, not for git) ==========
+deploy/
 
 # ========== TEMPORARY / DEV-ONLY SCRIPTS ==========
 write_settings.py
