@@ -17,9 +17,52 @@ import requests
 import pytz
 import traceback
 from django.conf import settings
+from django.db import connection
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET
 
 
 #  Create your views here.
+
+@require_GET
+@never_cache
+def health_check(request):
+    """
+    Health check endpoint — used by load balancers, uptime monitors, and Kubernetes probes.
+    Returns 200 OK when the app and database are reachable, 503 otherwise.
+
+    URL: /health/
+    Used by: AWS ALB, Nginx upcheck, UptimeRobot, GitHub Actions smoke test
+    """
+    health = {
+        'status': 'ok',
+        'db': 'ok',
+        'cache': 'ok',
+    }
+    http_status = 200
+
+    # Database check
+    try:
+        connection.ensure_connection()
+    except Exception as e:
+        health['db'] = f'error: {e}'
+        health['status'] = 'degraded'
+        http_status = 503
+
+    # Cache check (only when cache is configured)
+    try:
+        from django.core.cache import cache
+        cache.set('health_check_ping', 'pong', timeout=5)
+        if cache.get('health_check_ping') != 'pong':
+            health['cache'] = 'error: read-back failed'
+            health['status'] = 'degraded'
+            http_status = 503
+    except Exception as e:
+        health['cache'] = f'error: {e}'
+        # Cache failure is non-critical (app still works), don't set 503
+
+    return JsonResponse(health, status=http_status)
+
 
 def csrf_failure(request, reason=""):
     """Handle CSRF verification failures"""

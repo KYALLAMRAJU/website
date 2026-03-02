@@ -204,7 +204,8 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable advaitam.socket advaitam.service
 sudo systemctl start advaitam.socket
-sudo systemctl restart advaitam.service
+# Use 'reload' (SIGHUP → graceful worker replacement, zero downtime) not 'restart' (kills workers immediately)
+sudo systemctl reload advaitam.service 2>/dev/null || sudo systemctl restart advaitam.service
 
 # Step 11: Configure Nginx
 echo -e "${YELLOW}[11/12] Configuring Nginx...${NC}"

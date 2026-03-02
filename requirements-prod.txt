@@ -3,7 +3,11 @@ Django==5.2.9
 django-environ==0.12.0
 
 # ========== DATABASE ==========
-psycopg2-binary==2.9.9
+# psycopg2 (compiled) — NOT psycopg2-binary.
+# The binary wheel is not recommended for production: it bundles its own libpq
+# which can conflict with system SSL libs and is flagged in security audits.
+# deploy.sh installs libpq-dev so compiling works automatically on EC2.
+psycopg2==2.9.9
 
 # ========== REST API ==========
 djangorestframework==3.16.1
@@ -35,11 +39,17 @@ requests==2.32.4
 python-dateutil==2.9.0
 pytz==2025.2
 
+# ========== SECURITY ==========
+django-csp==3.8        # Content-Security-Policy headers — blocks XSS attacks
+
 # ========== ERROR TRACKING ==========
 sentry-sdk==2.52.0
 
 # ========== MONITORING ==========
 django-cors-headers==4.3.1
+
+# ========== CODE QUALITY (used in CI lint job — not needed at runtime) ==========
+ruff==0.9.10           # Fast Python linter + formatter (replaces flake8, isort, pyupgrade)
 
 # ========== CACHING (ElastiCache / Redis) ==========
 redis==5.0.8

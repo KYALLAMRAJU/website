@@ -1,0 +1,80 @@
+# ========== RUFF CONFIGURATION ==========
+# ruff is a fast Python linter + formatter (replaces flake8, isort, pyupgrade).
+# Docs: https://docs.astral.sh/ruff/
+#
+# Run:
+#   ruff check .          → lint check
+#   ruff check . --fix    → lint + auto-fix
+#   ruff format . --check → format check
+#   ruff format .         → format + auto-fix
+#   make check            → run both (via Makefile)
+
+# Target Python version (match your runtime)
+target-version = "py312"
+
+# Max line length (88 = Black default; most companies use 88 or 100)
+line-length = 100
+
+# Files/dirs to exclude from linting
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "migrations",       # Django migrations are auto-generated — don't lint them
+    "staticfiles",
+    "static",
+    "node_modules",
+    "*.egg-info",
+    "build",
+    "dist",
+]
+
+[lint]
+# Rule sets to enable:
+#   E, W  = pycodestyle errors/warnings
+#   F     = pyflakes (undefined names, unused imports)
+#   I     = isort (import ordering)
+#   N     = pep8-naming conventions
+#   UP    = pyupgrade (modernize syntax for Python 3.12)
+#   B     = flake8-bugbear (common bug patterns)
+#   S     = flake8-bandit (security issues) — enable selectively
+#   DJ    = flake8-django (Django-specific checks)
+select = ["E", "W", "F", "I", "N", "UP", "B", "DJ"]
+
+ignore = [
+    "E501",   # Line too long — handled by formatter, not linter
+    "B008",   # Do not perform function calls in default arguments (common in Django)
+    "N806",   # Variable in function should be lowercase (conflicts with Django class-based views)
+    "UP007",  # Use X | Y for type unions — keep Optional[] for clarity
+    "DJ001",  # Avoid using null=True on string-based fields — too noisy for existing projects
+]
+
+# Allow these "magic" fixable rules to be auto-fixed
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables if they start with _ (common pattern)
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+_*))$"
+
+[lint.per-file-ignores]
+# Test files: allow assert statements and magic values
+"*/tests*" = ["S101", "S105", "S106", "B011"]
+"test*.py" = ["S101", "S105", "S106"]
+# Settings file: allow broad imports and long lines
+"webProject/settings.py" = ["F401", "E402"]
+# Management commands: allow broad exception handling
+"*/management/commands/*" = ["B007"]
+
+[lint.isort]
+# Keep Django import ordering: stdlib → third-party → local
+known-first-party = ["webapp", "webProject"]
+known-third-party = ["django", "rest_framework", "drf_spectacular", "sentry_sdk", "boto3"]
+
+[format]
+# Use double quotes (Django convention)
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+

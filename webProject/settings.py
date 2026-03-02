@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework.authtoken',
     'taggit',
+    'csp',
     # Local apps
     'webapp',
 ]
@@ -102,6 +103,7 @@ if USE_S3:
 # ========== MIDDLEWARE ==========
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',   # Content-Security-Policy headers (blocks XSS)
 ]
 
 # WhiteNoise only needed in dev/fallback mode — S3+CloudFront serves static in prod
@@ -339,11 +341,33 @@ if not DEBUG:
         }
         SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-    # ========== SENTRY (uncomment when ready) ==========
-    # _SENTRY_DSN = env('SENTRY_DSN', default=None)
-    # if _SENTRY_DSN:
-    #     import sentry_sdk
-    #     sentry_sdk.init(dsn=_SENTRY_DSN, traces_sample_rate=0.2, environment='production')
+    # ========== SENTRY ERROR TRACKING ==========
+    # Only activates when SENTRY_DSN is set in .env — safe to leave empty in dev.
+    # Wrapped in try/except so a missing sentry-sdk package never crashes the server.
+    _SENTRY_DSN = env('SENTRY_DSN', default='')
+    if _SENTRY_DSN:
+        try:
+            import sentry_sdk
+            from sentry_sdk.integrations.django import DjangoIntegration
+            from sentry_sdk.integrations.logging import LoggingIntegration
+            sentry_sdk.init(
+                dsn=_SENTRY_DSN,
+                integrations=[
+                    DjangoIntegration(transaction_style='url'),
+                    LoggingIntegration(level=logging.WARNING, event_level=logging.ERROR),
+                ],
+                traces_sample_rate=0.1,   # 10% of transactions for performance monitoring
+                profiles_sample_rate=0.1, # 10% of transactions for profiling
+                environment='production',
+                send_default_pii=False,   # Don't send personally identifiable information
+            )
+        except ImportError:
+            import warnings
+            warnings.warn(
+                'SENTRY_DSN is set but sentry-sdk is not installed. '
+                'Run: pip install sentry-sdk',
+                RuntimeWarning,
+            )
 
 else:
     # Development: relax security settings
@@ -381,6 +405,40 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
     'SORT_OPERATIONS': False,
 }
+
+# ========== CONTENT SECURITY POLICY (CSP) ==========
+# django-csp 4.0+ format — uses CONTENT_SECURITY_POLICY dict (not the old CSP_* flat settings).
+# Protects against XSS attacks by controlling which resources browsers can load.
+# django-csp docs: https://django-csp.readthedocs.io/en/latest/configuration.html
+#
+# In dev  (DEBUG=True)  → CONTENT_SECURITY_POLICY_REPORT_ONLY: violations logged, nothing blocked.
+# In prod (DEBUG=False) → CONTENT_SECURITY_POLICY: violations are enforced and blocked.
+#
+# Set CSP_CLOUDFRONT_DOMAIN in .env to allow your CDN:
+#   CSP_CLOUDFRONT_DOMAIN=d1234abcd.cloudfront.net
+
+_csp_cloudfront = env('CSP_CLOUDFRONT_DOMAIN', default='')
+_csp_cdn = (f"https://{_csp_cloudfront}",) if _csp_cloudfront else ()
+
+_CSP_DIRECTIVES = {
+    'default-src': ("'self'",),
+    'script-src':  ("'self'",) + _csp_cdn + ("'unsafe-inline'",),  # unsafe-inline needed for Django admin
+    'style-src':   ("'self'",) + _csp_cdn + ("'unsafe-inline'",),  # inline styles common in admin
+    'img-src':     ("'self'",) + _csp_cdn + ("data:", "https:"),
+    'font-src':    ("'self'",) + _csp_cdn + ("https://fonts.gstatic.com",),
+    'connect-src': ("'self'", "https://sentry.io", "https://*.sentry.io"),
+    'media-src':   ("'self'",) + _csp_cdn,
+    'object-src':  ("'none'",),   # Block Flash, plugins
+    'base-uri':    ("'self'",),   # Block base-tag hijacking
+    'frame-src':   ("'none'",),   # No iframes
+}
+
+if DEBUG:
+    # Report-only in dev: log violations in browser console, never block anything
+    CONTENT_SECURITY_POLICY_REPORT_ONLY = {'DIRECTIVES': _CSP_DIRECTIVES}
+else:
+    # Enforce in production: violating resources are blocked by the browser
+    CONTENT_SECURITY_POLICY = {'DIRECTIVES': _CSP_DIRECTIVES}
 
 # ========== LOGGING ==========
 LOGS_DIR = BASE_DIR / 'logs'
