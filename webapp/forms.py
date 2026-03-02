@@ -145,21 +145,23 @@ class loginForm(forms.ModelForm):
     """ THE BELOW ONE IS A FORM LEVEL SINGLE CLEAN METHOD USED FOR VALIDATING MULTIPLE FIELDS TOGETHER"""
 
     def clean(self):
-        total_cleaned_data = super().clean()
+        total_cleaned_data = super().clean() # this is used to call the parent class's clean method and get the cleaned data from all the fields in the form as a dictionary and store it in total_cleaned_data variable and then we can perform our custom validation on that cleaned data and if there is any validation error we can raise forms.ValidationError with the appropriate error message and if there is no validation error we can return the total_cleaned_data at the end of the clean method
         print("Validating email and password together in clean method")
-        loginemail = total_cleaned_data['loginemail']
+        loginemail = total_cleaned_data.get('loginemail', '') #
         if not loginemail:
             raise forms.ValidationError("Email field cannot be empty")
         if not loginemail.endswith('.com') or ('@' not in loginemail):
             raise forms.ValidationError("Invalid email address please enter valid email")
         pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$'
-        loginpassword = total_cleaned_data['loginpassword']
+        loginpassword = total_cleaned_data.get('loginpassword', '')
+        if not loginpassword:
+            raise forms.ValidationError("Password field cannot be empty")
         if not re.search(pattern, loginpassword):
             raise forms.ValidationError(
                 "Password must contain at least 8 characters and should contain at least one uppercase letter, "
                 "one lowercase letter, one digit, and one special character:@$!%*?&#")
-        bothandler=total_cleaned_data['bothandler']
-        if len(bothandler)>0:
+        bothandler = total_cleaned_data.get('bothandler', '')
+        if len(bothandler) > 0:
             raise forms.ValidationError("Dont play with my website")
         return total_cleaned_data
 
@@ -210,7 +212,7 @@ class contactusForm(forms.ModelForm):
         widget=forms.Textarea(attrs={
             'class': 'form-control form-control-sm mb-4',
             'placeholder': 'Enter your message here',
-            'rows': 4,
+            'rows': 8,
         })
     )
 

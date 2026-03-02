@@ -1,0 +1,36 @@
+{% extends "htmlfiles/base.html" %}
+
+{% block title_block %}
+<title>CSRF Verification Failed</title>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">⚠️ CSRF Verification Failed</h4>
+                <p>{{ message }}</p>
+                {% if reason %}
+                <p><strong>Reason:</strong> {{ reason }}</p>
+                {% endif %}
+                <hr>
+                <p class="mb-0">
+                    <strong>What to do:</strong> Please go back and try again. If the problem persists, try:
+                    <ul>
+                        <li>Clearing your browser cache and cookies</li>
+                        <li>Logging out and logging back in</li>
+                        <li>Using a different browser</li>
+                        <li>Disabling browser extensions that might interfere with forms</li>
+                    </ul>
+                </p>
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'home' %}" class="btn btn-primary">Go to Home</a>
+                <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -19,12 +19,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from webapp.views import health_check
 
 urlpatterns = [
+    # ── Health check — always available (used by ALB, uptime monitors, k8s probes)
+    path('health/', health_check, name='health-check'),
 
     path('admin/', admin.site.urls),
     path("", include('webapp.urls')),
-    path('api-auth/', include('rest_framework.urls'))
 
 
     # path('accounts/', include('django.contrib.auth.urls')),
@@ -33,4 +35,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # DRF browsable API login/logout — only needed locally
+    urlpatterns += [path('api-auth/', include('rest_framework.urls'))]
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

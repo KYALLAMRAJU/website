@@ -1,0 +1,60 @@
+{% extends 'htmlfiles/base.html' %}
+{% load static %}
+
+{% block title_block %}
+    <title>Claude Test</title>
+{% endblock %}
+
+{% block childcode_block %}
+
+    <div class="container mt-4">
+
+        <h2 class="mb-3">Claude AI Test</h2>
+
+        <div class="card p-3 shadow-sm">
+
+            <div class="mb-3">
+            <textarea id="prompt"
+                      class="form-control"
+                      rows="6"
+                      placeholder="Ask anything..."></textarea>
+            </div>
+
+            <button class="btn btn-primary"
+                    onclick="ask()">
+                Send
+            </button>
+
+            <hr>
+
+            <div id="result"
+                 class="alert alert-light">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+        async function ask() {
+
+            const p =
+                document.getElementById("prompt").value;
+
+            const r = await fetch("/api/claude/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({prompt: p})
+            });
+
+            const d = await r.json();
+
+            document.getElementById("result").innerText =
+                d.response;
+        }
+    </script>
+
+{% endblock %}

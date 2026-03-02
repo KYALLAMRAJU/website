@@ -6,46 +6,166 @@
 {% endblock %}
 
 {% block childcode_block %}
-    <section class="gallery-page py-5 mt-5">
-        <div class="container text-center">
+    <!-- Modern Gallery Section -->
+    <section class="modern-gallery">
+        <!-- Animated Background -->
+        <div class="gallery-particles">
+            <div class="particle" style="left: 10%; top: 20%;"></div>
+            <div class="particle" style="left: 80%; top: 60%;"></div>
+            <div class="particle" style="left: 50%; top: 80%;"></div>
+        </div>
 
-            <!-- Heading -->
-            <h1 class="fw-bold mb-4 text-primary">Our Spiritual Gallery</h1>
-            <p class="text-secondary mb-5">
-                A glimpse into the divine — celebrating knowledge, peace, and devotion.
-            </p>
-
-            <!-- Centered Image Grid -->
-            <div class="gallery-container">
-                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
-                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
-                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
-                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
-                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
-                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
-                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
-                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
-                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
-                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
-                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
-                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
-                <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Adi Shankaracharya" class="gallery-img">
-                <img src="{% static 'images/SrinivasaRao.png' %}" alt="Srinivasa Rao" class="gallery-img">
-                <img src="{% static 'images/India.png' %}" alt="India Flag" class="gallery-img">
-                <img src="{% static 'images/USA.png' %}" alt="USA Flag" class="gallery-img">
+        <div class="container">
+            <!-- Header -->
+            <div class="gallery-header-modern">
+                <h1 class="gallery-title">Spiritual Gallery</h1>
+                <p class="gallery-subtitle">Discover our collection of sacred moments and cultural heritage</p>
+                <div class="underline"></div>
             </div>
 
+            <!-- Grid Gallery -->
+            <div class="modern-grid-gallery">
+                <!-- Item 1 -->
+                <div class="gallery-grid-item" data-size="large">
+                    <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Philosophy</p>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/SrinivasaRao.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Legacy</p>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="gallery-grid-item" data-size="small">
+                    <img src="{% static 'images/India.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Culture</p>
+                    </div>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/USA.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Global</p>
+                    </div>
+                </div>
+
+                <!-- Item 5 -->
+                <div class="gallery-grid-item" data-size="small">
+                    <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Wisdom</p>
+                    </div>
+                </div>
+
+                <!-- Item 6 -->
+                <div class="gallery-grid-item" data-size="large">
+                    <img src="{% static 'images/SrinivasaRao.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Heritage</p>
+                    </div>
+                </div>
+
+                <!-- Item 7 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/India.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Tradition</p>
+                    </div>
+                </div>
+
+                <!-- Item 8 -->
+                <div class="gallery-grid-item" data-size="small">
+                    <img src="{% static 'images/USA.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Community</p>
+                    </div>
+                </div>
+
+                <!-- Item 9 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Spirituality</p>
+                    </div>
+                </div>
+
+                <!-- Item 10 -->
+                <div class="gallery-grid-item" data-size="large">
+                    <img src="{% static 'images/SrinivasaRao.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Vision</p>
+                    </div>
+                </div>
+
+                <!-- Item 11 -->
+                <div class="gallery-grid-item" data-size="small">
+                    <img src="{% static 'images/India.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Identity</p>
+                    </div>
+                </div>
+
+                <!-- Item 12 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/USA.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Unity</p>
+                    </div>
+                </div>
+
+                <!-- Item 13 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/adishankaracharya.jpg' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Truth</p>
+                    </div>
+                </div>
+
+                <!-- Item 14 -->
+                <div class="gallery-grid-item" data-size="small">
+                    <img src="{% static 'images/SrinivasaRao.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Knowledge</p>
+                    </div>
+                </div>
+
+                <!-- Item 15 -->
+                <div class="gallery-grid-item" data-size="large">
+                    <img src="{% static 'images/India.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Eternal</p>
+                    </div>
+                </div>
+
+                <!-- Item 16 -->
+                <div class="gallery-grid-item" data-size="medium">
+                    <img src="{% static 'images/USA.png' %}" alt="Gallery" class="grid-img">
+                    <div class="grid-overlay">
+                        <p>Peace</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Lightbox Modal -->
-    <div id="lightbox" class="lightbox">
-        <span class="close">&times;</span>
-        <img class="lightbox-content" id="lightbox-img">
+    <div id="modern-lightbox" class="modern-lightbox">
+        <button class="lightbox-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="lightbox-image-src" src="" alt="">
     </div>
 
-    <!-- 🌙 FOOTER -->
-    <footer class="footer text-center py-4">
+    <!-- Footer -->
+    <footer class="footer text-center">
         <div class="container">
             <p class="mb-0 text-light small">
                 &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
@@ -54,25 +174,37 @@
     </footer>
 
     <script>
-        // Lightbox JS
-        const lightbox = document.getElementById("lightbox");
-        const lightboxImg = document.getElementById("lightbox-img");
-        const closeBtn = document.querySelector(".close");
+        // Modern Gallery Lightbox
+        const lightbox = document.getElementById('modern-lightbox');
+        const lightboxImg = document.getElementById('lightbox-image-src');
+        const closeBtn = document.querySelector('.lightbox-close-btn');
 
-        document.querySelectorAll(".gallery-img").forEach(img => {
-            img.addEventListener("click", () => {
-                lightbox.style.display = "flex";
+        document.querySelectorAll('.gallery-grid-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const img = this.querySelector('.grid-img');
                 lightboxImg.src = img.src;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
             });
         });
 
-        closeBtn.addEventListener("click", () => {
-            lightbox.style.display = "none";
+        closeBtn.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
         });
 
-        // Close on clicking outside image
-        lightbox.addEventListener("click", (e) => {
-            if (e.target !== lightboxImg) lightbox.style.display = "none";
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
         });
     </script>
 {% endblock %}

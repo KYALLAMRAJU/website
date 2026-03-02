@@ -7,18 +7,69 @@ from django.contrib.auth import authenticate, login, logout
 from webapp.models import *
 from django.views.generic import View, TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect, HttpResponse
-
-from django.core.mail import EmailMultiAlternatives, send_mail, EmailMessage, send_mass_mail
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.core.mail import EmailMultiAlternatives, send_mail, EmailMessage, send_mass_mail, get_connection
 from datetime import datetime, timedelta
 import random as r
+import time
 from django.utils import timezone
 import requests
 import pytz
+import traceback
 from django.conf import settings
+from django.db import connection
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET
 
 
 #  Create your views here.
+
+@require_GET
+@never_cache
+def health_check(request):
+    """
+    Health check endpoint — used by load balancers, uptime monitors, and Kubernetes probes.
+    Returns 200 OK when the app and database are reachable, 503 otherwise.
+
+    URL: /health/
+    Used by: AWS ALB, Nginx upcheck, UptimeRobot, GitHub Actions smoke test
+    """
+    health = {
+        'status': 'ok',
+        'db': 'ok',
+        'cache': 'ok',
+    }
+    http_status = 200
+
+    # Database check
+    try:
+        connection.ensure_connection()
+    except Exception as e:
+        health['db'] = f'error: {e}'
+        health['status'] = 'degraded'
+        http_status = 503
+
+    # Cache check (only when cache is configured)
+    try:
+        from django.core.cache import cache
+        cache.set('health_check_ping', 'pong', timeout=5)
+        if cache.get('health_check_ping') != 'pong':
+            health['cache'] = 'error: read-back failed'
+            health['status'] = 'degraded'
+            http_status = 503
+    except Exception as e:
+        health['cache'] = f'error: {e}'
+        # Cache failure is non-critical (app still works), don't set 503
+
+    return JsonResponse(health, status=http_status)
+
+
+def csrf_failure(request, reason=""):
+    """Handle CSRF verification failures"""
+    return render(request, 'htmlfiles/csrf_error.html', {
+        'message': 'CSRF verification failed. Please try again.',
+        'reason': reason
+    }, status=403)
 
 """def cookie_refresh(view_func):
     @wraps(view_func)
@@ -71,9 +122,39 @@ def signupForm_view(request):
             user.set_password(password)  # Hashing the password before saving
             user.save()
             submitted = True
+
+            # ========== EMAIL VERIFICATION FOR SIGNUP ==========
+            try:
+                subject = "Welcome to Advaitam - Verify Your Email"
+                message = f"""
+Hello {firstname.capitalize()} {lastname.capitalize()},
+
+Thank you for signing up on Advaitam! 
+
+Your account has been created successfully with the following details:
+- Username: {username}
+- Email: {email}
+
+This email confirms that your email address is registered with us. You can now log in with your credentials.
+
+Please keep your password safe and do not share it with anyone.
+
+If you did not create this account, please contact us immediately.
+
+Best regards,
+Advaitam Team
+"""
+                # Send verification email
+                send_mail(subject,message,settings.DEFAULT_FROM_EMAIL,[email],fail_silently=False,
+                )
+                print(f"Verification email sent successfully to {email}")
+            except Exception as e:
+                print(f"Error sending email: {str(e)}")
+                messages.warning(request, f"Account created but email could not be sent. You can still login.")
+
             # Add a success message or redirect to another page after successful signup
             messages.success(request,
-                             f"Account created successfully for {firstname.capitalize()}!. Please login to continue.")
+                             f"Account created successfully for {firstname.capitalize()}!. Verification email sent to {email}. Please login to continue.")
             # Redirect to login page after successful signup
             return redirect('/loginpage/')
         else:
@@ -107,9 +188,33 @@ def forgotpasswordForm_view(request):
             user = User.objects.get(email=email)
             user.set_password(newpassword)
             user.save()
+
+            # ========== EMAIL NOTIFICATION FOR PASSWORD RESET ==========
+            try:
+                subject = "Advaitam - Password Reset Successful"
+                message = f"""
+                            Hello {user.first_name.capitalize() if user.first_name else user.username},
+                            
+                            Your password has been successfully reset.
+                            
+                            Account Email: {email}
+                            
+                            You can now log in with your new password. Please keep your password safe and do not share it with anyone.
+                            
+                            If you did not request this password reset, please contact us immediately.
+                            
+                            Best regards,
+                            Advaitam Team
+                            """
+                # Send password reset confirmation email
+                send_mail(subject,message,settings.DEFAULT_FROM_EMAIL,[email],fail_silently=False,)
+                print(f"Password reset confirmation email sent successfully to {email}")
+            except Exception as e:
+                print(f"Error sending email: {str(e)}")
+                messages.warning(request, f"Password reset successful but confirmation email could not be sent.")
+
             # Add a success message or redirect to another page after successful password reset
-            messages.success(request,
-                             f"Password reset successfully for {email.split('@')[0].capitalize()}. Please login with your new password to continue.")
+            messages.success(request,f"Password reset successfully for {email.split('@')[0].capitalize()}. Confirmation email sent to {email}. Please login with your new password to continue.")
             # Redirect to login page after successful password reset
             return redirect('/loginpage/')
         else:
@@ -222,14 +327,8 @@ def loginForm_view(request):
                 username = user_obj.username
             except User.DoesNotExist:
                 username = None
-                messages.error(request,"User not found:Please check your entered data once again or sign up using signup link at bottom.")
+                messages.error(request,"User not found ! Please check your entered data once again or sign up using signup link at bottom.")
                 return render(request, 'htmlfiles/login.html', {'form': form})
-            print("DEBUG EMAIL:", email)
-            print("DEBUG PASSWORD:", password)
-            print("DEBUG USERNAME:", username)
-            print("DEBUG STORED HASH:", user_obj.password)
-            print("CHECK PASSWORD MATCH:", user_obj.check_password(password))
-            print("IS ACTIVE:", user_obj.is_active)
             # ✅ Try login
             user = authenticate(request, username=username, password=password)
             print("AUTHENTICATE RESULT:", user)
@@ -242,6 +341,17 @@ def loginForm_view(request):
     return render(request, 'htmlfiles/login.html', {'form': form})
 
 
+# ============================================================
+# SESSION PING — keeps session alive when user clicks "Stay Logged In"
+# ============================================================
+
+@login_required
+def session_ping(request):
+    """Silently refreshes the session expiry timer."""
+    if request.method == 'POST':
+        request.session.modified = True          # Django will save & reset the cookie age
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error', 'message': 'POST required'}, status=405)
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -285,27 +395,68 @@ def books_view(request):
 
 @login_required
 def contact_view(request):
-    form = contactusForm()
     if request.method == 'POST':
         form = contactusForm(request.POST)
         if form.is_valid():
-            cleaned_data = form.cleaned_data
-            name = f"{request.user.first_name} {request.user.last_name}".upper()
+            name = f"{request.user.first_name} {request.user.last_name}".strip().upper() or request.user.username.upper()
             email = request.user.email
-            subject = form.cleaned_data['subject'].upper()
+            subject = form.cleaned_data['subject']
             message = form.cleaned_data['message']
             contacus.objects.create(name=name, email=email, subject=subject, message=message)
-            # sending email using django send_mail function
-            full_message = (
-                "You have received a query about your website from User-{} about {} \n \n \n {}".format(name, subject,
-                                                                                                        message))
             try:
-                send_mail(subject, full_message, email, ['test@example.com'], fail_silently=False)
-                messages.success(request, "Your request has been noted. We will get back to you soon!")
+                admin_email = settings.ADMIN_EMAIL
+                user_email = email.strip() if email else None
+
+                print(f"[contact_view] admin_email={admin_email}, user_email={user_email}")
+
+                # ── Email 1: Notify admin ──────────────────────────────────────
+                admin_subject = f"[Advaitam Contact] {subject} - from {name}"
+                admin_body = (
+                    f"You have received a new contact message from:\n\n"
+                    f"Name   : {name}\n"
+                    f"Email  : {user_email or 'Not provided'}\n"
+                    f"Subject: {subject}\n\n"
+                    f"Message:\n{message}"
+                )
+                send_mail(
+                    admin_subject,
+                    admin_body,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [admin_email],
+                    fail_silently=False,
+                )
+                print(f"[contact_view] Admin email sent to {admin_email}")
+
+                # ── Email 2: Confirmation to user (only if different from admin) ──
+                if user_email and user_email.lower() != admin_email.lower():
+                    time.sleep(1.5)   # Mailtrap free plan: max 1 email/second
+                    user_subject = "Advaitam - We received your message!"
+                    user_body = (
+                        f"Dear {name.title()},\n\n"
+                        f"Thank you for reaching out to us. We have received your message "
+                        f"regarding \"{subject}\" and will get back to you soon.\n\n"
+                        f"Your message:\n{message}\n\n"
+                        f"Best regards,\nAdvaitam Team"
+                    )
+                    send_mail(
+                        user_subject,
+                        user_body,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [user_email],
+                        fail_silently=False,
+                    )
+                    print(f"[contact_view] Confirmation email sent to {user_email}")
+
+                print(f"[contact_view] All emails sent successfully")
+                return JsonResponse({'status': 'success', 'message': 'Your request has been noted. We will get back to you soon!'})
             except Exception as e:
-                print("Error sending email:", e)
-                messages.error(request, "There was an error sending your message. Please try again later.")
-        return redirect(request.META.get("HTTP_REFERER", "/"))
+                traceback.print_exc()
+                print(f"[contact_view] ERROR: {e}")
+                return JsonResponse({'status': 'error', 'message': 'There was an error sending your message. Please try again later.'}, status=500)
+        else:
+            print("[contact_view] Form invalid:", form.errors)
+            return JsonResponse({'status': 'error', 'message': 'Please fill in all required fields correctly.'}, status=400)
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
 # """ -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"""
@@ -961,8 +1112,25 @@ class DRFModelViewSet(ModelViewSet):
 
 
 
+#--------------------------------------------------------------------CLAUDE SERVICE VIEWS-------------------------------------------------------------------------------
+from webapp.services.claude_service import ClaudeService
+@csrf_exempt
+def claude_api(request):
+
+    if request.method != "POST":
+        return JsonResponse({"error": "POST only"})
+
+    data = json.loads(request.body)
+    prompt = data.get("prompt")
+
+    service = ClaudeService()
+    result = service.ask(prompt)
+
+    return JsonResponse({"response": result})
 
 
+def claude_page(request):
+    return render(request, 'htmlfiles/claude_chat.html')
 
 
 

@@ -1,103 +1,225 @@
 <!DOCTYPE html>
 {% extends 'htmlfiles/base.html' %}
 {% load static %}
+
 {% block title_block %}
-    <title>Books</title>
+    <title>Digital Wisdom Library | Advaita Vedanta</title>
 {% endblock %}
+
 {% block childcode_block %}
-    <section class="library-section py-5">
-        <div class="container text-center">
-            <h2 class="fw-bold mb-4 mt-5">Digital Wisdom Library</h2>
-            <p class="text-muted mb-5">Explore sacred texts and timeless philosophies in a new light.</p>
+    <!-- Modern Books Section -->
+    <section class="books-section">
+        <!-- Background Animation -->
+        <div class="books-bg-pattern"></div>
 
-            <div class="bookshelf d-flex flex-wrap justify-content-center gap-5">
+        <div class="container">
+            <!-- Header -->
+            <div class="books-header">
+                <div class="header-content">
+                    <h1 class="books-title">Digital Wisdom Library</h1>
+                    <p class="books-subtitle">Sacred texts, timeless philosophies, and spiritual knowledge curated for modern readers</p>
+                </div>
+                <div class="header-decoration"></div>
+            </div>
 
-                <!-- Bhagavad Gita -->
-                <div class="book-3d">
-                    <div class="book-inner">
-                        <div class="book-front">
-                            <img src="https://images.unsplash.com/photo-1581092335305-89a69beba9e7?auto=format&fit=crop&w=400"
-                                 alt="Bhagavad Gita">
-                            <div class="book-title">Bhagavad Gita</div>
+            <!-- Books Grid -->
+            <div class="books-grid">
+                <!-- Book 1 -->
+                <div class="book-card">
+                    <div class="book-image-container">
+                        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=500&h=600"
+                             alt="Bhagavad Gita" class="book-image">
+                        <div class="book-badge">Spiritual Text</div>
+                        <div class="book-overlay">
+                            <a href="{% static 'books/Django.pdf' %}" target="_blank" class="read-btn">
+                                <i class="fas fa-book-reader"></i> Start Reading
+                            </a>
                         </div>
-                        <div class="book-back">
-                            <h5>Bhagavad Gita</h5>
-                            <p>The timeless dialogue between Krishna and Arjuna.</p>
-                            <a href="{% static 'books/Django.pdf' %}" target="_blank" class="btn-read">Open
-                                Book</a>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-name">Bhagavad Gita</h3>
+                        <p class="book-author">Vyasa</p>
+                        <p class="book-description">The divine dialogue between Lord Krishna and the warrior Arjuna on life, duty, and enlightenment.</p>
+                        <div class="book-meta">
+                            <span class="meta-item"><i class="fas fa-book"></i> Sacred Scripture</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> 45 min read</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Upanishads -->
-                <div class="book-3d">
-                    <div class="book-inner">
-                        <div class="book-front">
-                            <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400"
-                                 alt="Upanishads">
-                            <div class="book-title">Upanishads</div>
+                <!-- Book 2 -->
+                <div class="book-card">
+                    <div class="book-image-container">
+                        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=500&h=600"
+                             alt="Upanishads" class="book-image">
+                        <div class="book-badge">Vedantic</div>
+                        <div class="book-overlay">
+                            <a href="{% static 'books/upanishads.pdf' %}" target="_blank" class="read-btn">
+                                <i class="fas fa-book-reader"></i> Start Reading
+                            </a>
                         </div>
-                        <div class="book-back">
-                            <h5>Upanishads</h5>
-                            <p>Exploring the eternal Self and the supreme Truth.</p>
-                            <a href="{% static 'books/upanishads.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-name">Upanishads</h3>
+                        <p class="book-author">Ancient Sages</p>
+                        <p class="book-description">Profound wisdom teachings exploring the nature of Brahman, the Self, and ultimate reality.</p>
+                        <div class="book-meta">
+                            <span class="meta-item"><i class="fas fa-book"></i> Philosophical</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> 60 min read</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Upanishads -->
-                <div class="book-3d">
-                    <div class="book-inner">
-                        <div class="book-front">
-                            <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400"
-                                 alt="Upanishads">
-                            <div class="book-title">Upanishads</div>
+                <!-- Book 3 -->
+                <div class="book-card">
+                    <div class="book-image-container">
+                        <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=500&h=600"
+                             alt="Advaita Philosophy" class="book-image">
+                        <div class="book-badge">Philosophy</div>
+                        <div class="book-overlay">
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="read-btn">
+                                <i class="fas fa-book-reader"></i> Start Reading
+                            </a>
                         </div>
-                        <div class="book-back">
-                            <h5>Upanishads</h5>
-                            <p>Exploring the eternal Self and the supreme Truth.</p>
-                            <a href="{% static 'books/upanishads.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-name">Advaita Philosophy</h3>
+                        <p class="book-author">Adi Shankaracharya</p>
+                        <p class="book-description">The non-dual teachings of the greatest philosopher of India, explaining the unity of Brahman and Atman.</p>
+                        <div class="book-meta">
+                            <span class="meta-item"><i class="fas fa-book"></i> Non-Dualism</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> 55 min read</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Advaita Philosophy -->
-                <div class="book-3d">
-                    <div class="book-inner">
-                        <div class="book-front">
-                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
-                                 alt="Advaita Philosophy">
-                            <div class="book-title">Advaita Philosophy</div>
+                <!-- Book 4 -->
+                <div class="book-card">
+                    <div class="book-image-container">
+                        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=500&h=600"
+                             alt="Brahma Sutras" class="book-image">
+                        <div class="book-badge">Philosophical</div>
+                        <div class="book-overlay">
+                            <a href="{% static 'books/Django.pdf' %}" target="_blank" class="read-btn">
+                                <i class="fas fa-book-reader"></i> Start Reading
+                            </a>
                         </div>
-                        <div class="book-back">
-                            <h5>Advaita Philosophy</h5>
-                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
-                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-name">Brahma Sutras</h3>
+                        <p class="book-author">Badarayana</p>
+                        <p class="book-description">A systematic exposition of Vedantic philosophy in aphoristic form, the foundation of Advaita Vedanta.</p>
+                        <div class="book-meta">
+                            <span class="meta-item"><i class="fas fa-book"></i> Systematic</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> 50 min read</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Advaita Philosophy -->
-                <div class="book-3d">
-                    <div class="book-inner">
-                        <div class="book-front">
-                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
-                                 alt="Advaita Philosophy">
-                            <div class="book-title">Advaita Philosophy</div>
+                <!-- Book 5 -->
+                <div class="book-card">
+                    <div class="book-image-container">
+                        <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=500&h=600"
+                             alt="Yoga Sutras" class="book-image">
+                        <div class="book-badge">Spiritual Path</div>
+                        <div class="book-overlay">
+                            <a href="{% static 'books/upanishads.pdf' %}" target="_blank" class="read-btn">
+                                <i class="fas fa-book-reader"></i> Start Reading
+                            </a>
                         </div>
-                        <div class="book-back">
-                            <h5>Advaita Philosophy</h5>
-                            <p>Teachings of Adi Shankaracharya on Oneness.</p>
-                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="btn-read">Open Book</a>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-name">Yoga Sutras</h3>
+                        <p class="book-author">Patanjali</p>
+                        <p class="book-description">The classic guide to Raja Yoga, detailing the path to liberation through meditation and spiritual discipline.</p>
+                        <div class="book-meta">
+                            <span class="meta-item"><i class="fas fa-book"></i> Practical</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> 48 min read</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Advaita Philosophy -->
-                <div class="book-3d">
-                    <div class="book-inner">
-                        <div class="book-front">
-                            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400"
+                <!-- Book 6 -->
+                <div class="book-card">
+                    <div class="book-image-container">
+                        <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=500&h=600"
+                             alt="Mandukya Upanishad" class="book-image">
+                        <div class="book-badge">Upanishadic</div>
+                        <div class="book-overlay">
+                            <a href="{% static 'books/advaita.pdf' %}" target="_blank" class="read-btn">
+                                <i class="fas fa-book-reader"></i> Start Reading
+                            </a>
+                        </div>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-name">Mandukya Upanishad</h3>
+                        <p class="book-author">Vedic Sages</p>
+                        <p class="book-description">An esoteric teaching on the sacred syllable OM and the states of consciousness in spiritual evolution.</p>
+                        <div class="book-meta">
+                            <span class="meta-item"><i class="fas fa-book"></i> Esoteric</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> 35 min read</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0 text-light small">
+                &copy; 2025 Advaita Vedanta • Designed with ❤️ by <strong>KALYAN YALLAMRAJU</strong>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll animations for cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.book-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Ripple effect on button click
+        document.querySelectorAll('.read-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: rgba(255, 255, 255, 0.5);
+                    border-radius: 50%;
+                    left: ${x}px;
+                    top: ${y}px;
+                    animation: ripple 0.6s ease-out;
+                `;
+
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+{% endblock %}
                                  alt="Advaita Philosophy">
                             <div class="book-title">Advaita Philosophy</div>
                         </div>
@@ -152,4 +274,3 @@
             </p>
         </div>
     </footer>
-{% endblock %}

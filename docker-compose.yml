@@ -1,0 +1,91 @@
+# ========== ADVAITAM LOCAL DEVELOPMENT — docker-compose.yml ==========
+# Spins up Django + PostgreSQL + Redis locally with a single command.
+#
+# Usage:
+#   docker compose up            # start all services
+#   docker compose up -d         # start in background
+#   docker compose down          # stop and remove containers
+#   docker compose down -v       # also remove named volumes (wipes DB data)
+#   docker compose logs -f web   # tail Django logs
+#   docker compose exec web python manage.py createsuperuser
+#   docker compose exec web python manage.py shell
+#
+# First run:
+#   cp .env.example .env         # or copy from deploy/06-TEMPLATES/.env.prod.template
+#   docker compose up
+
+services:
+
+  # ── PostgreSQL Database ────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME:-advaitam_db}
+      POSTGRES_USER:     ${DB_USER:-advaitam_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-devpassword123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"          # expose to host for DB GUI tools (TablePlus, DBeaver)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-advaitam_user} -d ${DB_NAME:-advaitam_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis Cache / Session Store ────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"          # expose to host for redis-cli debugging
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Django Application ─────────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime          # use the lean runtime stage (not builder)
+    restart: unless-stopped
+    env_file: .env             # load all env vars from .env file
+    environment:
+      # Override DB/Redis to point at Docker service names (not localhost)
+      DB_HOST:   db
+      DB_PORT:   5432
+      REDIS_URL: redis://redis:6379/0
+      DEBUG:     "True"        # set to False to test production mode locally
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source code for live reload during development
+      - .:/app
+      - /app/.venv             # exclude venv from bind mount
+      - /app/staticfiles       # exclude collected static from bind mount
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Override CMD to use Django dev server with auto-reload
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+# ── Named Volumes ──────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+
