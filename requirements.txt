@@ -78,7 +78,7 @@ multidict==6.7.0
 mysql-connector==2.2.9
 mysql-connector-python==9.1.0
 nbclient==0.10.0
-nbconvert==7.16.4
+nbconvert==7.17.0
 nbformat==5.10.4
 nest-asyncio==1.6.0
 notebook==7.2.2
