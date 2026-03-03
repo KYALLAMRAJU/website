@@ -69,6 +69,12 @@ help:
 	@echo "    make backup        Run backup.sh (manual DB backup → S3)"
 	@echo "    make logs          Tail Django log file"
 	@echo "    make clean         Remove __pycache__, .pyc files, test artifacts"
+	@echo ""
+	@echo "  Docs"
+	@echo "    make docs          Rebuild HTML deployment guide from .md file"
+	@echo "    make docs-watch    Auto-rebuild HTML whenever .md file is saved"
+	@echo "    (Windows alt)      python build_docs.py  OR  docs.bat"
+	@echo "    (Windows watch)    python build_docs.py --watch  OR  docs.bat watch"
 	@echo "  ─────────────────────────────────────────────────────────"
 	@echo ""
 
@@ -194,6 +200,16 @@ docker-build:
 .PHONY: docker-logs
 docker-logs:
 	docker compose logs -f web
+
+# ── Docs ──────────────────────────────────────────────────────────────────────
+.PHONY: docs
+docs:
+	$(PYTHON) build_docs.py
+	@echo "✅  Open deploy/05-AWS/AWS_PRODUCTION_DEPLOYMENT_GUIDE.html in your browser"
+
+.PHONY: docs-watch
+docs-watch:
+	$(PYTHON) build_docs.py --watch
 
 # ── Maintenance ───────────────────────────────────────────────────────────────
 .PHONY: backup

@@ -129,7 +129,7 @@ def signupForm_view(request):
                 message = f"""
 Hello {firstname.capitalize()} {lastname.capitalize()},
 
-Thank you for signing up on Advaitam! 
+Thank you for signing up on Advaitam!
 
 Your account has been created successfully with the following details:
 - Username: {username}
