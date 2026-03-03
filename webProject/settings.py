@@ -6,10 +6,11 @@ Architecture:
   Static/Media files served via CloudFront -> S3
 """
 
-from pathlib import Path
-import os
-import environ
 import logging
+import os
+from pathlib import Path
+
+import environ
 
 # ========== ENVIRONMENT SETUP ==========
 BASE_DIR = Path(__file__).resolve().parent.parent

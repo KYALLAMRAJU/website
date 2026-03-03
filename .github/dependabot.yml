@@ -1,26 +1,16 @@
 # Dependabot configuration file for GitHub
-# This file enables automatic security scanning and dependency updates
-# Place this in: .github/dependabot.yml
+# Enables automatic security scanning and dependency updates
+# Docs: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
 updates:
-  # Python Dependencies
+  # Python Dependencies — scans requirements-prod.txt in the repo root
   - package-ecosystem: "pip"
     directory: "/"
-    files:
-      include:
-        - "requirements-prod.txt"
     schedule:
       interval: "daily"
       time: "03:00"
     open-pull-requests-limit: 5
-    reviewers:
-      - "KYALLAMRAJU"
-    assignees:
-      - "KYALLAMRAJU"
-    labels:
-      - "security"
-      - "dependencies"
     commit-message:
       prefix: "security:"
       include: "scope"

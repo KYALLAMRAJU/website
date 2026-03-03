@@ -46,6 +46,8 @@ mydatabase
 deploy/
 
 # ========== TEMPORARY / DEV-ONLY SCRIPTS ==========
+# NOTE: build_docs.py and docs.bat are intentionally NOT ignored —
+#       they are permanent project tools committed to the repo.
 write_settings.py
 fakerdata.py
 oracle_patch.py
