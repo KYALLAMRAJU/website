@@ -1,6 +1,7 @@
 import json
 from webapp.models import wishdata
 
+
 class reusable:
     def get_object_by_id(self, id):
         print(type(id))
@@ -8,18 +9,16 @@ class reusable:
             if not str(id).isdigit():
                 print("inside id is not in")
                 return None
-            id=int(id)
+            id = int(id)
             obj = wishdata.objects.get(id=id)
         except wishdata.DoesNotExist:
             obj = None
         return obj
 
-    def is_json(self,incomingdata):
+    def is_json(self, incomingdata):
         try:
-            p_data=json.loads(incomingdata)
-            valid=True
+            p_data = json.loads(incomingdata)
+            valid = True
         except ValueError:
-            valid=False
-        return  valid
-
-
+            valid = False
+        return valid

@@ -48,6 +48,7 @@ logger = logging.getLogger(__name__)
 #   - `test_user`   → OUR custom fixture: creates a real User in the test DB
 # =============================================================================
 
+
 @pytest.fixture
 def test_user(db):
     """
@@ -64,9 +65,7 @@ def test_user(db):
       - NEVER touches your real db.sqlite3 or PostgreSQL
     """
     user = User.objects.create_user(
-        username='testuser',
-        email='testuser@example.com',
-        password='StrongPass123!'
+        username="testuser", email="testuser@example.com", password="StrongPass123!"
     )
     return user  # return the user so tests can use it
 
@@ -93,6 +92,7 @@ def test_user(db):
 #   client.post('/some/url/', data={...}) → simulates submitting a form
 # =============================================================================
 
+
 class TestLoginGET:
     """
     GROUP 1: Testing the GET request (just loading the login page)
@@ -117,7 +117,7 @@ class TestLoginGET:
           403 → Forbidden (not logged in / CSRF fail)
           404 → Not found
         """
-        url = reverse('loginpage')     # reverse() converts URL name → actual path
+        url = reverse("loginpage")  # reverse() converts URL name → actual path
         # reverse('loginpage') returns '/loginpage/'
         # Using reverse() is BETTER than hardcoding '/loginpage/' because
         # if you ever change the URL in urls.py, the test still works.
@@ -138,15 +138,15 @@ class TestLoginGET:
 
         assertTemplateUsed() checks which template Django rendered.
         """
-        url = reverse('loginpage')
+        url = reverse("loginpage")
 
         response = client.get(url)
-        print(response) # Print the response object to see its attributes (for debugging)
+        print(response)  # Print the response object to see its attributes (for debugging)
         assert response.status_code == 200
         # Check the correct template was used
-        assert 'htmlfiles/login.html' in [t.name for t in response.templates if t.name is not None]
+        assert "htmlfiles/login.html" in [t.name for t in response.templates if t.name is not None]
 
-        logging.info('the correct template is used for login page is login.html')
+        logging.info("the correct template is used for login page is login.html")
 
     def test_login_page_has_form(self, client):
         """
@@ -160,10 +160,10 @@ class TestLoginGET:
           If someone removes 'form' from the render() call, the template
           would crash or show a blank form. This catches that.
         """
-        url = reverse('loginpage')
+        url = reverse("loginpage")
         response = client.get(url)
 
-        assert 'form' in response.context  # form was passed to template
+        assert "form" in response.context  # form was passed to template
 
 
 # =============================================================================
@@ -178,6 +178,7 @@ class TestLoginGET:
 #   4. Right email, right password     → redirect to /home/
 # =============================================================================
 
+
 class TestLoginPOST:
     """GROUP 2: Testing POST requests to the login form."""
 
@@ -188,11 +189,8 @@ class TestLoginPOST:
         Expected: stay on the login page (200), show form errors.
         Should NOT redirect (302).
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': '',
-            'loginpassword': ''
-        })
+        url = reverse("loginpage")
+        response = client.post(url, data={"loginemail": "", "loginpassword": ""})
 
         assert response.status_code == 200  # stayed on same page, not redirected
 
@@ -213,11 +211,14 @@ class TestLoginPOST:
           - Stay on login page (200)
           - Show an error message to the user
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': 'nobody@example.com',   # valid format, but user doesn't exist
-            'loginpassword': 'StrongPass123!'       # valid format password
-        })
+        url = reverse("loginpage")
+        response = client.post(
+            url,
+            data={
+                "loginemail": "nobody@example.com",  # valid format, but user doesn't exist
+                "loginpassword": "StrongPass123!",  # valid format password
+            },
+        )
 
         assert response.status_code == 200
 
@@ -226,8 +227,7 @@ class TestLoginPOST:
         assert len(messages_list) > 0
 
         message_texts = [str(m) for m in messages_list]
-        assert any('not found' in text.lower() or 'check' in text.lower()
-                   for text in message_texts)
+        assert any("not found" in text.lower() or "check" in text.lower() for text in message_texts)
 
     def test_login_with_wrong_password_shows_error(self, client, test_user):
         """
@@ -243,18 +243,23 @@ class TestLoginPOST:
           Just put the fixture name as a parameter → pytest injects it.
           test_user fixture runs BEFORE this test, creating the user.
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': 'testuser@example.com',     # correct email (user exists)
-            'loginpassword': 'WrongPassword999!'       # WRONG password
-        })
+        url = reverse("loginpage")
+        response = client.post(
+            url,
+            data={
+                "loginemail": "testuser@example.com",  # correct email (user exists)
+                "loginpassword": "WrongPassword999!",  # WRONG password
+            },
+        )
 
         assert response.status_code == 200  # stayed on login page
 
         messages_list = list(response.wsgi_request._messages)
         message_texts = [str(m) for m in messages_list]
-        assert any('wrong' in text.lower() or 'password' in text.lower() or 'inactive' in text.lower()
-                   for text in message_texts)
+        assert any(
+            "wrong" in text.lower() or "password" in text.lower() or "inactive" in text.lower()
+            for text in message_texts
+        )
 
     def test_successful_login_redirects_to_home(self, client, test_user):
         """
@@ -274,16 +279,15 @@ class TestLoginPOST:
           response['Location']         → where it redirected to
           client.get(url, follow=True) → follow the redirect automatically
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': 'testuser@example.com',
-            'loginpassword': 'StrongPass123!'
-        })
+        url = reverse("loginpage")
+        response = client.post(
+            url, data={"loginemail": "testuser@example.com", "loginpassword": "StrongPass123!"}
+        )
 
         # Should redirect (302) after successful login
         assert response.status_code == 302
         # Should redirect to /home/
-        assert response['Location'] == '/home/'
+        assert response["Location"] == "/home/"
 
     def test_successful_login_user_is_authenticated(self, client, test_user):
         """
@@ -297,15 +301,16 @@ class TestLoginPOST:
           Maybe the view redirected but forgot to call login().
           This test catches that.
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': 'testuser@example.com',
-            'loginpassword': 'StrongPass123!'
-        }, follow=True)  # follow=True automatically follows the redirect
+        url = reverse("loginpage")
+        response = client.post(
+            url,
+            data={"loginemail": "testuser@example.com", "loginpassword": "StrongPass123!"},
+            follow=True,
+        )  # follow=True automatically follows the redirect
 
         # After following redirect, check the user is authenticated
         assert response.wsgi_request.user.is_authenticated
-        assert response.wsgi_request.user.username == 'testuser'
+        assert response.wsgi_request.user.username == "testuser"
 
 
 # =============================================================================
@@ -317,6 +322,7 @@ class TestLoginPOST:
 # Let's test that behaviour too.
 # =============================================================================
 
+
 class TestLoginRedirectBehaviour:
     """GROUP 3: Testing redirect behaviour."""
 
@@ -327,11 +333,11 @@ class TestLoginRedirectBehaviour:
 
         This tests that @login_required decorator on homepage_view works.
         """
-        response = client.get('/home/')
+        response = client.get("/home/")
 
         # Should redirect to login page
         assert response.status_code == 302
-        assert '/loginpage/' in response['Location']
+        assert "/loginpage/" in response["Location"]
 
     def test_login_with_next_param_redirects_correctly(self, client, test_user):
         """
@@ -347,14 +353,13 @@ class TestLoginRedirectBehaviour:
           → Redirected to /loginpage/?next=/audio/
           → After login → redirected back to /audio/
         """
-        url = reverse('loginpage') + '?next=/audio/'
-        response = client.post(url, data={
-            'loginemail': 'testuser@example.com',
-            'loginpassword': 'StrongPass123!'
-        })
+        url = reverse("loginpage") + "?next=/audio/"
+        response = client.post(
+            url, data={"loginemail": "testuser@example.com", "loginpassword": "StrongPass123!"}
+        )
 
         assert response.status_code == 302
-        assert response['Location'] == '/audio/'  # went to the originally requested page
+        assert response["Location"] == "/audio/"  # went to the originally requested page
 
 
 # =============================================================================
@@ -375,15 +380,19 @@ class TestLoginRedirectBehaviour:
 #       ...
 # =============================================================================
 
+
 class TestLoginInvalidInputs:
     """GROUP 4: Testing many invalid inputs using parametrize."""
 
-    @pytest.mark.parametrize('email, password', [
-        ('',                    ''               ),  # both empty
-        ('notanemail',          'somepassword'   ),  # invalid email format
-        ('a' * 200 + '@x.com',  'password'       ),  # email too long
-        ('test@example.com',    ''               ),  # password empty
-    ])
+    @pytest.mark.parametrize(
+        "email, password",
+        [
+            ("", ""),  # both empty
+            ("notanemail", "somepassword"),  # invalid email format
+            ("a" * 200 + "@x.com", "password"),  # email too long
+            ("test@example.com", ""),  # password empty
+        ],
+    )
     def test_invalid_form_data_stays_on_login_page(self, client, email, password):
         """
         For ALL these invalid inputs, the page should NOT redirect.
@@ -397,11 +406,8 @@ class TestLoginInvalidInputs:
           PASSED test_login_view.py::TestLoginInvalidInputs::test_invalid_...[notanemail-somepassword]
           etc.
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': email,
-            'loginpassword': password
-        })
+        url = reverse("loginpage")
+        response = client.post(url, data={"loginemail": email, "loginpassword": password})
 
         # All invalid inputs should stay on the form page, not redirect
         assert response.status_code == 200
@@ -445,6 +451,7 @@ class TestLoginInvalidInputs:
 # We'll add mock tests for signup in the next test file.
 # =============================================================================
 
+
 class TestLoginMocking:
     """GROUP 5: Demonstrating mocking concept on login."""
 
@@ -463,13 +470,10 @@ class TestLoginMocking:
 
         For now, we test indirectly — if login works, authenticate was called.
         """
-        url = reverse('loginpage')
-        response = client.post(url, data={
-            'loginemail': 'testuser@example.com',
-            'loginpassword': 'StrongPass123!'
-        })
+        url = reverse("loginpage")
+        response = client.post(
+            url, data={"loginemail": "testuser@example.com", "loginpassword": "StrongPass123!"}
+        )
         # If authenticate() wasn't called, login wouldn't work
         # So a 302 redirect proves it was called successfully
         assert response.status_code == 302
-
-

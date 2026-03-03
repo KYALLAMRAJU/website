@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 
 class ClaudeAPITest(TestCase):
-
     def setUp(self):
         self.client = Client()
 
@@ -12,17 +11,12 @@ class ClaudeAPITest(TestCase):
         mock_ask.return_value = "Hello from mock"
 
         response = self.client.post(
-            "/api/claude/",
-            data={"prompt": "hi"},
-            content_type="application/json"
+            "/api/claude/", data={"prompt": "hi"}, content_type="application/json"
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("response", response.json())
-        self.assertEqual(
-            response.json()["response"],
-            "Hello from mock"
-        )
+        self.assertEqual(response.json()["response"], "Hello from mock")
 
     def test_claude_api_only_post(self):
         response = self.client.get("/api/claude/")

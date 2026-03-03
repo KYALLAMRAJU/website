@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 # Module-level list — each test appends its result here as it finishes
 _results = []
 
+
 # =============================================================================
 # FIXTURE — save_response_html
 # =============================================================================
@@ -41,7 +42,7 @@ def save_response_html():
     Call it inside a test to save a response's HTML to test-results/html-snapshots/.
     Open the saved file in any browser to see what the page looked like.
     """
-    folder = os.path.join('test-results', 'html-snapshots')
+    folder = os.path.join("test-results", "html-snapshots")
     os.makedirs(folder, exist_ok=True)
 
     def _save(response, name):
@@ -55,14 +56,14 @@ def save_response_html():
         """
         # Get the HTML content from the response
         # response.content is raw bytes — decode to a string
-        html_content = response.content.decode('utf-8', errors='replace')
+        html_content = response.content.decode("utf-8", errors="replace")
 
         # Build the full file path
         filename = f"{name}.html"
         filepath = os.path.join(folder, filename)
 
         # Write the HTML file
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(html_content)
 
         # Also print the path so it shows in the terminal
@@ -83,19 +84,21 @@ def save_response_html():
 def pytest_runtest_makereport(item, call):
     outcome = yield
     rep = outcome.get_result()
-    if rep.when == 'call':
-        parts  = item.nodeid.replace('\\', '/').split('::')
-        module = parts[0].replace('webapp/tests/', '')
-        cls    = parts[1] if len(parts) > 2 else '-'
-        fn     = parts[-1]
-        _results.append({
-            'module':   module,
-            'cls':      cls,
-            'fn':       fn,
-            'status':   'passed' if rep.passed else ('failed' if rep.failed else 'skipped'),
-            'duration': round(rep.duration, 3),
-            'longrepr': str(rep.longrepr) if rep.failed else '',
-        })
+    if rep.when == "call":
+        parts = item.nodeid.replace("\\", "/").split("::")
+        module = parts[0].replace("webapp/tests/", "")
+        cls = parts[1] if len(parts) > 2 else "-"
+        fn = parts[-1]
+        _results.append(
+            {
+                "module": module,
+                "cls": cls,
+                "fn": fn,
+                "status": "passed" if rep.passed else ("failed" if rep.failed else "skipped"),
+                "duration": round(rep.duration, 3),
+                "longrepr": str(rep.longrepr) if rep.failed else "",
+            }
+        )
 
 
 # =============================================================================
@@ -106,53 +109,57 @@ def pytest_runtest_makereport(item, call):
 # =============================================================================
 def pytest_sessionfinish(session, exitstatus):
     """Generate a modern dark-theme HTML report with Chart.js charts."""
-    os.makedirs('test-results', exist_ok=True)
+    os.makedirs("test-results", exist_ok=True)
 
-    n_passed = sum(1 for r in _results if r['status'] == 'passed')
-    n_failed = sum(1 for r in _results if r['status'] == 'failed')
-    n_skip   = sum(1 for r in _results if r['status'] == 'skipped')
-    total    = len(_results)
+    n_passed = sum(1 for r in _results if r["status"] == "passed")
+    n_failed = sum(1 for r in _results if r["status"] == "failed")
+    n_skip = sum(1 for r in _results if r["status"] == "skipped")
+    total = len(_results)
     pass_pct = round((n_passed / total * 100) if total > 0 else 0, 1)
 
     # ── Table rows ──────────────────────────────────────────────────────
-    rows_html = ''
+    rows_html = ""
     for r in _results:
-        st = r['status']
-        if st == 'passed':
+        st = r["status"]
+        if st == "passed":
             badge = '<span class="badge badge-pass">PASSED</span>'
-        elif st == 'failed':
+        elif st == "failed":
             badge = '<span class="badge badge-fail">FAILED</span>'
         else:
             badge = '<span class="badge badge-skip">SKIPPED</span>'
 
-        detail = ''
-        if r['longrepr']:
-            esc = (r['longrepr']
-                   .replace('&', '&amp;').replace('<', '&lt;')
-                   .replace('>', '&gt;').replace('"', '&quot;'))
+        detail = ""
+        if r["longrepr"]:
+            esc = (
+                r["longrepr"]
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace('"', "&quot;")
+            )
             detail = f'<tr class="detail-row"><td colspan="5"><pre class="traceback">{esc}</pre></td></tr>'
 
-        rows_html += f'''
+        rows_html += f"""
         <tr class="row-{st}" onclick="toggleDetail(this)">
           <td>{r["module"]}</td>
           <td><span class="cls-tag">{r["cls"]}</span></td>
           <td class="fn-name">{r["fn"]}</td>
           <td>{badge}</td>
           <td>{r["duration"]}s</td>
-        </tr>{detail}'''
+        </tr>{detail}"""
 
     # ── Bar chart grouped by class ───────────────────────────────────────
     groups = {}
     for r in _results:
-        g = r['cls']
+        g = r["cls"]
         if g not in groups:
-            groups[g] = {'passed': 0, 'failed': 0}
-        groups[g][r['status']] = groups[g].get(r['status'], 0) + 1
+            groups[g] = {"passed": 0, "failed": 0}
+        groups[g][r["status"]] = groups[g].get(r["status"], 0) + 1
 
     bar_labels = json.dumps(list(groups.keys()))
-    bar_pass   = json.dumps([groups[g].get('passed', 0) for g in groups])
-    bar_fail   = json.dumps([groups[g].get('failed', 0) for g in groups])
-    now        = datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')
+    bar_pass = json.dumps([groups[g].get("passed", 0) for g in groups])
+    bar_fail = json.dumps([groups[g].get("failed", 0) for g in groups])
+    now = datetime.datetime.now().strftime("%B %d, %Y at %I:%M %p")
 
     # ── HTML ─────────────────────────────────────────────────────────────
     html = f"""<!DOCTYPE html>
@@ -307,24 +314,22 @@ document.querySelectorAll('.detail-row').forEach(r=>r.style.display='none');
 </body>
 </html>"""
 
-    out = os.path.join('test-results', 'custom_report.html')
-    with open(out, 'w', encoding='utf-8') as f:
+    out = os.path.join("test-results", "custom_report.html")
+    with open(out, "w", encoding="utf-8") as f:
         f.write(html)
 
 
 # =============================================================================
 # FIXTURES
 # =============================================================================
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def test_user(db):
     """
     Creates a basic test user.
     Available to ALL test files automatically.
     """
     return User.objects.create_user(
-        username='testuser',
-        email='testuser@example.com',
-        password='StrongPass123!'
+        username="testuser", email="testuser@example.com", password="StrongPass123!"
     )
 
 
@@ -335,9 +340,7 @@ def admin_user(db):
     Useful for testing admin-only views.
     """
     return User.objects.create_superuser(
-        username='adminuser',
-        email='admin@example.com',
-        password='AdminPass123!'
+        username="adminuser", email="admin@example.com", password="AdminPass123!"
     )
 
 
