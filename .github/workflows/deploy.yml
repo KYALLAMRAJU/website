@@ -31,6 +31,7 @@ jobs:
     - name: Run ruff formatter check
       run: ruff format . --check
 
+
   # ── Job 2: Tests ───────────────────────────────────────────────────────────
   test:
     runs-on: ubuntu-latest

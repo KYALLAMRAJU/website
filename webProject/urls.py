@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -22,12 +23,9 @@ from webapp.views import health_check
 
 urlpatterns = [
     # ── Health check — always available (used by ALB, uptime monitors, k8s probes)
-    path('health/', health_check, name='health-check'),
-
-    path('admin/', admin.site.urls),
-    path("", include('webapp.urls')),
-
-
+    path("health/", health_check, name="health-check"),
+    path("admin/", admin.site.urls),
+    path("", include("webapp.urls")),
     # path('accounts/', include('django.contrib.auth.urls')),
     # ✅ Force Django to use your custom login page
     # path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'),name='login'),
@@ -35,5 +33,5 @@ urlpatterns = [
 
 if settings.DEBUG:
     # DRF browsable API login/logout — only needed locally
-    urlpatterns += [path('api-auth/', include('rest_framework.urls'))]
+    urlpatterns += [path("api-auth/", include("rest_framework.urls"))]
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

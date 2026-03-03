@@ -26,12 +26,14 @@ Architecture:
     AWS_STORAGE_BUCKET_NAME=advaitam-assets
     AWS_S3_CUSTOM_DOMAIN=xxxxxxxxxxxx.cloudfront.net   ← CloudFront domain
 """
+
 try:
     from storages.backends.s3boto3 import S3Boto3Storage
 except ImportError:
     # If django-storages is not installed/configured (e.g. dev mode without S3),
     # create a dummy class to avoid ImportErrors.
     from django.core.files.storage import FileSystemStorage
+
     S3Boto3Storage = FileSystemStorage
 
 from django.conf import settings
@@ -55,15 +57,16 @@ class StaticStorage(S3Boto3Storage):
       static/fonts/       → web fonts (if added)
       static/admin/       → Django admin CSS/JS/images (auto-added by collectstatic)
     """
-    location = 'static'
-    default_acl = None           # No public ACL — CloudFront OAC handles access
-    querystring_auth = False     # No signed URLs; CloudFront delivers publicly
-    file_overwrite = True        # Overwrite during collectstatic (intentional)
+
+    location = "static"
+    default_acl = None  # No public ACL — CloudFront OAC handles access
+    querystring_auth = False  # No signed URLs; CloudFront delivers publicly
+    file_overwrite = True  # Overwrite during collectstatic (intentional)
 
     @property
     def custom_domain(self):
         # Use CloudFront domain from settings (populated from AWS_S3_CUSTOM_DOMAIN env var)
-        return getattr(settings, 'AWS_S3_CUSTOM_DOMAIN', None)
+        return getattr(settings, "AWS_S3_CUSTOM_DOMAIN", None)
 
 
 class MediaStorage(S3Boto3Storage):
@@ -79,11 +82,12 @@ class MediaStorage(S3Boto3Storage):
     DO NOT confuse with StaticStorage — audio/images/PDFs in your project are YOUR files,
     not user uploads, so they go under StaticStorage above.
     """
-    location = 'media'
-    default_acl = None           # No public ACL — CloudFront OAC handles access
-    querystring_auth = False     # No signed URLs for public content
-    file_overwrite = False       # Preserve existing uploads — append unique suffix
+
+    location = "media"
+    default_acl = None  # No public ACL — CloudFront OAC handles access
+    querystring_auth = False  # No signed URLs for public content
+    file_overwrite = False  # Preserve existing uploads — append unique suffix
 
     @property
     def custom_domain(self):
-        return getattr(settings, 'AWS_S3_CUSTOM_DOMAIN', None)
+        return getattr(settings, "AWS_S3_CUSTOM_DOMAIN", None)

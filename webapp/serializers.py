@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from webapp.models import *
 
-def multiples_of_10(value): #our custom validator function (i.e independent function)
+
+def multiples_of_10(value):  # our custom validator function (i.e independent function)
     print("inside custom validator")
     if len(value) != 0:
         raise serializers.ValidationError("The value must be a 10 digit number")
+
 
 # class wishserializer(serializers.Serializer):
 #     username = serializers.CharField(max_length=20)
@@ -33,26 +35,28 @@ def multiples_of_10(value): #our custom validator function (i.e independent func
 #         instance.save()
 #         return instance
 
-class wishserializer(serializers.ModelSerializer):
 
+class wishserializer(serializers.ModelSerializer):
     class Meta:
         model = wishdata
-        fields = '__all__'
+        fields = "__all__"
 
-    username = serializers.CharField(max_length=20) # we can also add custom validators to the model serializer fields
+    username = serializers.CharField(
+        max_length=20
+    )  # we can also add custom validators to the model serializer fields
     name = serializers.CharField(max_length=20)
 
-    def validate(self,data):
+    def validate(self, data):
         print("inside object level validation")
-        username = data.get('name')
+        username = data.get("name")
         if username is not None:
-            if username.lower()=='admin':
+            if username.lower() == "admin":
                 raise serializers.ValidationError("username cannot be admin")
-        if wishdata.objects.filter(username=data.get('username')).exists():
+        if wishdata.objects.filter(username=data.get("username")).exists():
             raise serializers.ValidationError("username already exists")
-        name=data.get('name')
+        name = data.get("name")
         if name is not None:
-            if len(name)<4:
+            if len(name) < 4:
                 raise serializers.ValidationError("name must be at least 4 characters long")
         return data
 
@@ -60,13 +64,12 @@ class wishserializer(serializers.ModelSerializer):
 class bookSerializer(serializers.ModelSerializer):
     class Meta:
         model = book
-        fields = '__all__'
+        fields = "__all__"
 
 
 class authorSerializer(serializers.ModelSerializer):
     class Meta:
         model = author
-        fields = '__all__'
+        fields = "__all__"
+
     books_by_author = bookSerializer(many=True, read_only=True)
-
-

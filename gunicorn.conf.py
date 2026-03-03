@@ -10,6 +10,7 @@ Tuning rationale:
 
 Socket: /run/advaitam/gunicorn.sock  (Nginx proxies to this Unix socket)
 """
+
 # ========== BINDING ==========
 # Unix socket — faster than TCP for same-machine Nginx → Gunicorn IPC
 bind = "unix:/run/advaitam/gunicorn.sock"
@@ -23,19 +24,19 @@ worker_class = "sync"
 worker_connections = 500
 
 # ========== TIMEOUTS ==========
-timeout = 120           # Kill worker if request takes > 120s (audio streaming needs this)
-graceful_timeout = 30   # Give workers 30s to finish in-flight requests on reload
-keepalive = 5           # Keep connections alive for 5s (behind Nginx, this is fine)
+timeout = 120  # Kill worker if request takes > 120s (audio streaming needs this)
+graceful_timeout = 30  # Give workers 30s to finish in-flight requests on reload
+keepalive = 5  # Keep connections alive for 5s (behind Nginx, this is fine)
 
 # ========== MEMORY MANAGEMENT ==========
 # Recycle workers periodically to prevent slow memory leaks
 max_requests = 1000
-max_requests_jitter = 50       # Stagger recycling to avoid simultaneous restarts
-preload_app = True             # Load Django app before forking → saves ~60MB via CoW
-worker_tmp_dir = "/dev/shm"    # Use RAM-based tmpfs for heartbeat files (faster)
+max_requests_jitter = 50  # Stagger recycling to avoid simultaneous restarts
+preload_app = True  # Load Django app before forking → saves ~60MB via CoW
+worker_tmp_dir = "/dev/shm"  # Use RAM-based tmpfs for heartbeat files (faster)
 
 # ========== LOGGING ==========
 accesslog = "/home/advaitam/app/logs/gunicorn_access.log"
-errorlog  = "/home/advaitam/app/logs/gunicorn_error.log"
-loglevel  = "warning"
-capture_output = True          # Redirect Django print() / stderr to error log
+errorlog = "/home/advaitam/app/logs/gunicorn_error.log"
+loglevel = "warning"
+capture_output = True  # Redirect Django print() / stderr to error log
