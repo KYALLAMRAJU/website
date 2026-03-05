@@ -33,7 +33,6 @@ if settings.DEBUG:
     urlpatterns += [
         # ----------------------------------------------------------THE BELOW PATHS ARE FOR CLAUDE-----------------------------------------------
         path("claude/", views.claude_page, name="claude"),
-        path("api/claude/", views.claude_api, name="claude-api"),
         # ---------------------------------------------------------DRF {DJANGO REST FRAMEWORK}------------------------------------------------
         path("api/", views.DRFAPIVIEW.as_view()),
         path("api/<int:id>/", views.DRFAPIVIEW.as_view()),
@@ -87,6 +86,8 @@ if settings.DEBUG:
 #   PRODUCTION URLs — always active
 # ======================================================
 urlpatterns += [
+    # -------------------------------------------------------- CLAUDE API --------------------------------------------------------
+    path("api/claude/", views.claude_api, name="claude-api"),
     # -------------------------------------------------------- WEBSITE URLS --------------------------------------------------------
     path("loginpage/", views.loginForm_view, name="loginpage"),
     path("signupform/", views.signupForm_view, name="signupform"),
