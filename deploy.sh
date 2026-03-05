@@ -21,8 +21,8 @@ PROJECT_DIR="/home/advaitam/app"
 VENV_DIR="/home/advaitam/venv"
 PYTHON="$VENV_DIR/bin/python"
 PIP="$VENV_DIR/bin/pip"
-DOMAIN="advaitam.info"
-ORIGIN_DOMAIN="origin.advaitam.info"
+DOMAIN="advaitam.info"                   # Used in Step 12 certbot output and next-steps summary
+ORIGIN_DOMAIN="origin.advaitam.info"    # Used in Nginx server_name and certbot command
 
 # Step 1: Update system
 echo -e "${YELLOW}[1/12] Updating system packages...${NC}"
@@ -186,7 +186,6 @@ Group=www-data
 WorkingDirectory=$PROJECT_DIR
 EnvironmentFile=$PROJECT_DIR/.env
 Environment=DJANGO_ENV=production
-ExecStart=$VENV_DIR/bin/gunicorn \
 ExecStart=$VENV_DIR/bin/gunicorn \\
           --config $PROJECT_DIR/gunicorn.conf.py \\
           webProject.wsgi:application

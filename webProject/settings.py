@@ -111,6 +111,7 @@ if USE_S3:
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "csp.middleware.CSPMiddleware",  # Content-Security-Policy headers (blocks XSS)
+    "corsheaders.middleware.CorsMiddleware",  # CORS headers — must be before CommonMiddleware
 ]
 
 # WhiteNoise only needed in dev/fallback mode — S3+CloudFront serves static in prod
@@ -307,7 +308,7 @@ CSRF_COOKIE_SAMESITE = "Lax"
 
 # ========== PRODUCTION SECURITY ==========
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = False
@@ -401,6 +402,18 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "COERCE_DECIMAL_TO_STRING": False,
+    # ── Rate Limiting (Throttling) ──────────────────────────────────────────
+    # Protects the API from abuse / brute-force / DoS attacks.
+    # anon: unauthenticated users (e.g. public API callers)
+    # user: authenticated users (stricter limits possible per view)
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/minute",   # unauthenticated: 60 requests per minute
+        "user": "300/minute",  # authenticated: 300 requests per minute
+    },
 }
 
 # ========== DRF SPECTACULAR ==========

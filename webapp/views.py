@@ -359,9 +359,6 @@ def forgotpasswordForm_view(request):
 # login form using django built-in authentication system
 def loginForm_view(request):
     form = loginForm()
-    print(
-        "THIS LINE IS FOR DEBUGGING PURPOSE ONLY: CURRENT : CHECKING IF IT IS HITTING THE MIDDLEWARE AND VIEW FUNCTION"
-    )
     submitted = False
     if request.method == "POST":
         form = loginForm(request.POST)
@@ -380,7 +377,6 @@ def loginForm_view(request):
                 return render(request, "htmlfiles/login.html", {"form": form})
             # ✅ Try login
             user = authenticate(request, username=username, password=password)
-            print("AUTHENTICATE RESULT:", user)
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Welcome , {username}!")
