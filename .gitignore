@@ -135,6 +135,7 @@ static/audio/**/*.mp3
 # ========== LOCAL DOCUMENTATION (dev-only .md notes, not for repo) ==========
 static/audio/audio-connection-guide.md
 static/audio/audio-html-js-deep-dive.md
+webProject/SETTINGS_DETAILED_EXPLANATION.md
 
 # ========== SECRETS & KEYS ==========
 *.pem
