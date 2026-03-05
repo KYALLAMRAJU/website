@@ -159,7 +159,7 @@ if DEBUG:
 else:
     # Production: PostgreSQL on EC2 (local, no RDS)
     _DB_HOST = env("DB_HOST", default="localhost")
-    _DB_OPTIONS = {"connect_timeout": 10}
+    _DB_OPTIONS: dict = {"connect_timeout": 10}
     # Only require SSL for remote hosts (e.g. RDS), not for localhost
     if _DB_HOST not in ("localhost", "127.0.0.1"):
         _DB_OPTIONS["sslmode"] = "require"
@@ -370,6 +370,9 @@ if not DEBUG:
                 send_default_pii=False,  # Don't send personally identifiable information
             )
         except ImportError:
+            sentry_sdk = None  # type: ignore[assignment]
+            DjangoIntegration = None  # type: ignore[assignment]
+            LoggingIntegration = None  # type: ignore[assignment]
             import warnings
 
             warnings.warn(
@@ -411,7 +414,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "60/minute",   # unauthenticated: 60 requests per minute
+        "anon": "60/minute",  # unauthenticated: 60 requests per minute
         "user": "300/minute",  # authenticated: 300 requests per minute
     },
 }
