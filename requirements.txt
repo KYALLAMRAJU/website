@@ -119,7 +119,7 @@ requests==2.32.4
 requests-toolbelt==1.0.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
-rich==14.2.0
+rich==14.3.3
 rpds-py==0.20.0
 Send2Trash==1.8.3
 setuptools==78.1.1
