@@ -45,7 +45,9 @@ TEMPLATE_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
 # ========== SECURITY - SECRET KEY ==========
-SECRET_KEY = env("SECRET_KEY", default="django-insecure-change-me-in-production")  # change this line according to your company
+SECRET_KEY = env(
+    "SECRET_KEY", default="django-insecure-change-me-in-production"
+)  # change this line according to your company
 
 # ========== DEBUG MODE ==========
 DEBUG = env.bool("DEBUG", default=False)
@@ -59,9 +61,9 @@ ALLOWED_HOSTS = env.list(
     default=[
         "127.0.0.1",
         "localhost",
-        "advaitam.info",          # change this line according to your company
-        "www.advaitam.info",      # change this line according to your company
-        "origin.advaitam.info",   # change this line according to your company
+        "advaitam.info",  # change this line according to your company
+        "www.advaitam.info",  # change this line according to your company
+        "origin.advaitam.info",  # change this line according to your company
     ],
 )
 
@@ -69,9 +71,9 @@ ALLOWED_HOSTS = env.list(
 CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS",
     default=[
-        "https://advaitam.info",           # change this line according to your company
-        "https://www.advaitam.info",       # change this line according to your company
-        "https://origin.advaitam.info",    # change this line according to your company
+        "https://advaitam.info",  # change this line according to your company
+        "https://www.advaitam.info",  # change this line according to your company
+        "https://origin.advaitam.info",  # change this line according to your company
         "http://localhost",
         "http://localhost:8000",
         "http://127.0.0.1",
@@ -82,7 +84,9 @@ CSRF_TRUSTED_ORIGINS = env.list(
 
 # ========== CLOUDFRONT ORIGIN PROTECTION SECRET ==========
 # Must match the X-CloudFront-Secret header value configured in Nginx
-CLOUDFRONT_SECRET = env("CLOUDFRONT_SECRET", default="")  # change this line according to your company
+CLOUDFRONT_SECRET = env(
+    "CLOUDFRONT_SECRET", default=""
+)  # change this line according to your company
 
 # ========== INSTALLED APPS ==========
 INSTALLED_APPS = [
@@ -99,7 +103,7 @@ INSTALLED_APPS = [
     "taggit",
     "csp",
     # ── django-allauth (OAuth2 / Social Login) ──────────────────────────────
-    "django.contrib.sites",          # Required by allauth
+    "django.contrib.sites",  # Required by allauth
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -137,7 +141,9 @@ MIDDLEWARE += [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-ROOT_URLCONF = "webProject.urls"  # change this line according to your company (update to your project name)
+ROOT_URLCONF = (
+    "webProject.urls"  # change this line according to your company (update to your project name)
+)
 
 TEMPLATES = [
     {
@@ -177,8 +183,12 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": env("DB_NAME", default="advaitam_db"),        # change this line according to your company
-            "USER": env("DB_USER", default="postgres"),           # change this line according to your company
+            "NAME": env(
+                "DB_NAME", default="advaitam_db"
+            ),  # change this line according to your company
+            "USER": env(
+                "DB_USER", default="postgres"
+            ),  # change this line according to your company
             "PASSWORD": env("DB_PASSWORD", default=""),
             "HOST": _DB_HOST,
             "PORT": env("DB_PORT", default="5432"),
@@ -204,22 +214,33 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # ========== INTERNATIONALIZATION ==========
-LANGUAGE_CODE = "en-us"   # change this line according to your company (e.g. "en-gb", "fr", "de")
-TIME_ZONE = "UTC"         # change this line according to your company (e.g. "Asia/Kolkata", "America/New_York")
+LANGUAGE_CODE = "en-us"  # change this line according to your company (e.g. "en-gb", "fr", "de")
+TIME_ZONE = (
+    "UTC"  # change this line according to your company (e.g. "Asia/Kolkata", "America/New_York")
+)
 USE_I18N = True
 USE_TZ = True
 
 # ========== STATIC & MEDIA FILES CONFIGURATION ==========
 if USE_S3:
     # ========== AWS S3 + CLOUDFRONT CONFIGURATION (PRODUCTION) ==========
-    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="advaitam-assets")  # change this line according to your company
-    AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="us-east-1")                  # change this line according to your company
+    AWS_STORAGE_BUCKET_NAME = env(
+        "AWS_STORAGE_BUCKET_NAME", default="advaitam-assets"
+    )  # change this line according to your company
+    AWS_S3_REGION_NAME = env(
+        "AWS_S3_REGION_NAME", default="us-east-1"
+    )  # change this line according to your company
     AWS_S3_CUSTOM_DOMAIN = env(
-        "AWS_S3_CUSTOM_DOMAIN", default=f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"    # change this line according to your company
+        "AWS_S3_CUSTOM_DOMAIN",
+        default=f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com",  # change this line according to your company
     )
     # Leave blank to use EC2 IAM Instance Role (recommended)
-    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="")        # change this line according to your company
-    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")  # change this line according to your company
+    AWS_ACCESS_KEY_ID = env(
+        "AWS_ACCESS_KEY_ID", default=""
+    )  # change this line according to your company
+    AWS_SECRET_ACCESS_KEY = env(
+        "AWS_SECRET_ACCESS_KEY", default=""
+    )  # change this line according to your company
 
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
     STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -254,9 +275,13 @@ else:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ========== DJANGO AUTH & SESSION ==========
-LOGIN_URL = "/loginpage/"                        # change this line according to your company (update to your login URL)
-LOGIN_REDIRECT_URL = "/home/"                    # change this line according to your company (update to your post-login landing page)
-LOGOUT_REDIRECT_URL = "/loginpage/"             # change this line according to your company (update to your post-logout page)
+LOGIN_URL = "/loginpage/"  # change this line according to your company (update to your login URL)
+LOGIN_REDIRECT_URL = (
+    "/home/"  # change this line according to your company (update to your post-login landing page)
+)
+LOGOUT_REDIRECT_URL = (
+    "/loginpage/"  # change this line according to your company (update to your post-logout page)
+)
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE", default=86400)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = env.bool("SESSION_EXPIRE_AT_BROWSER_CLOSE", default=False)
@@ -274,23 +299,23 @@ AUTHENTICATION_BACKENDS = [
 
 # ========== ALLAUTH — ACCOUNT SETTINGS ==========
 # allauth 65.x style (replaces old ACCOUNT_AUTHENTICATION_METHOD etc.)
-ACCOUNT_LOGIN_METHODS = {"email"}              # login via email only (no username)
-ACCOUNT_SIGNUP_FIELDS = [                      # fields shown on allauth's own signup form
+ACCOUNT_LOGIN_METHODS = {"email"}  # login via email only (no username)
+ACCOUNT_SIGNUP_FIELDS = [  # fields shown on allauth's own signup form
     "email*",
     "password1*",
     "password2*",
 ]
-ACCOUNT_EMAIL_VERIFICATION = "optional"        # change to "mandatory" in production
+ACCOUNT_EMAIL_VERIFICATION = "optional"  # change to "mandatory" in production
 ACCOUNT_LOGIN_REDIRECT_URL = "/home/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/loginpage/"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_UNIQUE_EMAIL = True
 
 # ========== ALLAUTH — SOCIAL ACCOUNT SETTINGS ==========
-SOCIALACCOUNT_AUTO_SIGNUP = True                # auto-create Django user on first social login
-SOCIALACCOUNT_LOGIN_ON_GET = False              # require POST to prevent CSRF on social login
+SOCIALACCOUNT_AUTO_SIGNUP = True  # auto-create Django user on first social login
+SOCIALACCOUNT_LOGIN_ON_GET = False  # require POST to prevent CSRF on social login
 SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"       # provider already verified; skip extra email step
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # provider already verified; skip extra email step
 
 # ── OAuth2 Provider Credentials (set in .env) ──────────────────────────────
 # Each provider needs its own Client ID & Secret from the provider's developer portal.
@@ -302,12 +327,12 @@ SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
             "client_id": env("GOOGLE_OAUTH_CLIENT_ID", default=""),
-            "secret":    env("GOOGLE_OAUTH_SECRET",    default=""),
-            "key":       "",
+            "secret": env("GOOGLE_OAUTH_SECRET", default=""),
+            "key": "",
         },
-        "SCOPE":      ["profile", "email"],
+        "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {"access_type": "online"},
-        "OAUTH_PKCE_ENABLED": True,             # PKCE = extra security layer
+        "OAUTH_PKCE_ENABLED": True,  # PKCE = extra security layer
     },
     # ── GitHub ───────────────────────────────────────────────────────────────
     # Create at: https://github.com/settings/developers → OAuth Apps → New OAuth App
@@ -315,8 +340,8 @@ SOCIALACCOUNT_PROVIDERS = {
     "github": {
         "APP": {
             "client_id": env("GITHUB_OAUTH_CLIENT_ID", default=""),
-            "secret":    env("GITHUB_OAUTH_SECRET",    default=""),
-            "key":       "",
+            "secret": env("GITHUB_OAUTH_SECRET", default=""),
+            "key": "",
         },
         "SCOPE": ["user", "user:email"],
     },
@@ -326,16 +351,25 @@ SOCIALACCOUNT_PROVIDERS = {
     "facebook": {
         "METHOD": "oauth2",
         "SDK_URL": "//connect.facebook.net/{locale}/sdk.js",
-        "SCOPE":   ["email", "public_profile"],
+        "SCOPE": ["email", "public_profile"],
         "AUTH_PARAMS": {"auth_type": "reauthenticate"},
-        "FIELDS":  ["id", "email", "name", "first_name", "last_name", "verified", "locale", "picture"],
+        "FIELDS": [
+            "id",
+            "email",
+            "name",
+            "first_name",
+            "last_name",
+            "verified",
+            "locale",
+            "picture",
+        ],
         "EXCHANGE_TOKEN": True,
         "VERIFIED_EMAIL": False,
-        "VERSION":  "v19.0",
+        "VERSION": "v19.0",
         "APP": {
-            "client_id": env("FACEBOOK_APP_ID",     default=""),
-            "secret":    env("FACEBOOK_APP_SECRET", default=""),
-            "key":       "",
+            "client_id": env("FACEBOOK_APP_ID", default=""),
+            "secret": env("FACEBOOK_APP_SECRET", default=""),
+            "key": "",
         },
     },
     # ── Twitter / X (OAuth 2.0) ───────────────────────────────────────────────
@@ -344,8 +378,8 @@ SOCIALACCOUNT_PROVIDERS = {
     "twitter_oauth2": {
         "APP": {
             "client_id": env("TWITTER_OAUTH_CLIENT_ID", default=""),
-            "secret":    env("TWITTER_OAUTH_SECRET",    default=""),
-            "key":       "",
+            "secret": env("TWITTER_OAUTH_SECRET", default=""),
+            "key": "",
         },
         "SCOPE": ["tweet.read", "users.read", "offline.access"],
     },
@@ -383,7 +417,9 @@ if DEBUG:
     EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 else:
     # Production: AWS SES SMTP
-    _ses_region = env("AWS_SES_REGION_NAME", default="us-east-1")  # change this line according to your company
+    _ses_region = env(
+        "AWS_SES_REGION_NAME", default="us-east-1"
+    )  # change this line according to your company
     EMAIL_BACKEND = env(
         "EMAIL_BACKEND",
         default="django.core.mail.backends.smtp.EmailBackend",
@@ -392,14 +428,22 @@ else:
         "EMAIL_HOST",
         default=f"email-smtp.{_ses_region}.amazonaws.com",  # change this line according to your company (update region)
     )
-    EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")      # change this line according to your company
-    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")  # change this line according to your company
+    EMAIL_HOST_USER = env(
+        "EMAIL_HOST_USER", default=""
+    )  # change this line according to your company
+    EMAIL_HOST_PASSWORD = env(
+        "EMAIL_HOST_PASSWORD", default=""
+    )  # change this line according to your company
     EMAIL_PORT = env.int("EMAIL_PORT", default=587)
     EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
     EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)  # use TLS OR SSL, not both
 
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@advaitam.info")  # change this line according to your company
-ADMIN_EMAIL = env("ADMIN_EMAIL", default="kalyan.py28@gmail.com")                # change this line according to your company
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL", default="noreply@advaitam.info"
+)  # change this line according to your company
+ADMIN_EMAIL = env(
+    "ADMIN_EMAIL", default="kalyan.py28@gmail.com"
+)  # change this line according to your company
 
 # ========== CSRF & SECURITY SETTINGS ==========
 CSRF_FAILURE_VIEW = "webapp.views.csrf_failure"  # change this line according to your company (update to your app name)
@@ -424,7 +468,9 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
     # ========== CACHE & SESSION (PRODUCTION) ==========
-    REDIS_URL = env("REDIS_URL", default="")  # change this line according to your company (set your Redis URL)
+    REDIS_URL = env(
+        "REDIS_URL", default=""
+    )  # change this line according to your company (set your Redis URL)
 
     if REDIS_URL:
         CACHES = {
@@ -451,7 +497,9 @@ if not DEBUG:
     # ========== SENTRY ERROR TRACKING ==========
     # Only activates when SENTRY_DSN is set in .env — safe to leave empty in dev.
     # Wrapped in try/except so a missing sentry-sdk package never crashes the server.
-    _SENTRY_DSN = env("SENTRY_DSN", default="")  # change this line according to your company (set your Sentry DSN)
+    _SENTRY_DSN = env(
+        "SENTRY_DSN", default=""
+    )  # change this line according to your company (set your Sentry DSN)
     if _SENTRY_DSN:
         try:
             import sentry_sdk
@@ -491,14 +539,13 @@ if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOWED_ORIGINS = [
-        "https://advaitam.info",       # change this line according to your company
-        "https://www.advaitam.info",   # change this line according to your company
+        "https://advaitam.info",  # change this line according to your company
+        "https://www.advaitam.info",  # change this line according to your company
     ]
 
 # ================================================================== REST FRAMEWORK ========================================================================================
 
 REST_FRAMEWORK = {
-
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.TokenAuthentication",
@@ -513,20 +560,16 @@ REST_FRAMEWORK = {
         # rest_framework.permissions.DjangoModelPermissions,
         # rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly,
     ),
-
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ),
-    'SEARCH_PARAM': 'mysearch',# this is used for DRF seraching with our own search param name
-    'ORDERING_PARAM': 'myordering', # THIS IS USED FOR DRF ORDERING WITH OUR OWN ORDERING PARAM NAME
-
-
+    "SEARCH_PARAM": "mysearch",  # this is used for DRF seraching with our own search param name
+    "ORDERING_PARAM": "myordering",  # THIS IS USED FOR DRF ORDERING WITH OUR OWN ORDERING PARAM NAME
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,  # change this line according to your company (adjust page size as needed)
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "COERCE_DECIMAL_TO_STRING": False,
-
     # ── Rate Limiting (Throttling) ──────────────────────────────────────────
     # Protects the API from abuse / brute-force / DoS attacks.
     # anon: unauthenticated users (e.g. public API callers)
@@ -536,7 +579,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "60/minute",   # change this line according to your company (adjust rate limit as needed)
+        "anon": "60/minute",  # change this line according to your company (adjust rate limit as needed)
         "user": "300/minute",  # change this line according to your company (adjust rate limit as needed)
     },
 }
@@ -553,37 +596,36 @@ SIMPLE_JWT = {
     # ── Token lifetimes ───────────────────────────────────────────────────────
     # Access token expires quickly (short-lived) for security.
     # Refresh token lives longer — used to get a new access token without re-login.
-    "ACCESS_TOKEN_LIFETIME":  timedelta(minutes=env.int("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", default=60)),   # change this line according to your company
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=env.int("JWT_REFRESH_TOKEN_EXPIRE_DAYS", default=1)),         # change this line according to your company
-
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=env.int("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", default=60)
+    ),  # change this line according to your company
+    "REFRESH_TOKEN_LIFETIME": timedelta(
+        days=env.int("JWT_REFRESH_TOKEN_EXPIRE_DAYS", default=1)
+    ),  # change this line according to your company
     # ── Rotation & blacklist ──────────────────────────────────────────────────
     # ROTATE_REFRESH_TOKENS: issue a new refresh token every time the client refreshes.
     # BLACKLIST_AFTER_ROTATION: invalidate the old refresh token after rotation (requires 'rest_framework_simplejwt.token_blacklist' in INSTALLED_APPS).
-    "ROTATE_REFRESH_TOKENS":  False,
+    "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": True,  # updates User.last_login on every successful token obtain
-
     # ── Signing ───────────────────────────────────────────────────────────────
-    "ALGORITHM":   "HS256",
+    "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,  # uses Django's SECRET_KEY to sign JWTs
-
     # ── Header format ─────────────────────────────────────────────────────────
     # Client must send:  Authorization: Bearer <access_token>
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_HEADER_NAME":  "HTTP_AUTHORIZATION",
-
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     # ── Token claims ──────────────────────────────────────────────────────────
-    "USER_ID_FIELD": "id",        # field from User model to include in token
-    "USER_ID_CLAIM": "user_id",   # key name used in the JWT payload
-
+    "USER_ID_FIELD": "id",  # field from User model to include in token
+    "USER_ID_CLAIM": "user_id",  # key name used in the JWT payload
     # ── Token classes ─────────────────────────────────────────────────────────
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
-    "TOKEN_TYPE_CLAIM":   "token_type",
+    "TOKEN_TYPE_CLAIM": "token_type",
 }
 
 # ============================================ DRF SPECTACULAR ==================================================================================
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Advaitam API",                                        # change this line according to your company
+    "TITLE": "Advaitam API",  # change this line according to your company
     "DESCRIPTION": (
         "Welcome to the **Advaitam API** documentation!\n\n"
         "Here you can explore all available API endpoints for the Advaitam Django project.\n\n"
@@ -595,7 +637,7 @@ SPECTACULAR_SETTINGS = {
         "- Nested serializers and advanced API patterns\n\n"
         "_Enjoy using the API!_"
     ),
-    "VERSION": "1.0.0",                                             # change this line according to your company
+    "VERSION": "1.0.0",  # change this line according to your company
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
@@ -606,7 +648,7 @@ SPECTACULAR_SETTINGS = {
     #     }
     # ]
 }
-#===========================================================================================================================
+# ===========================================================================================================================
 # ========== CONTENT SECURITY POLICY (CSP) ==========
 # django-csp 4.0+ format — uses CONTENT_SECURITY_POLICY dict (not the old CSP_* flat settings).
 # Protects against XSS attacks by controlling which resources browsers can load.
@@ -618,7 +660,9 @@ SPECTACULAR_SETTINGS = {
 # Set CSP_CLOUDFRONT_DOMAIN in .env to allow your CDN:
 #   CSP_CLOUDFRONT_DOMAIN=d1234abcd.cloudfront.net
 
-_csp_cloudfront = env("CSP_CLOUDFRONT_DOMAIN", default="")  # change this line according to your company (set your CloudFront domain)
+_csp_cloudfront = env(
+    "CSP_CLOUDFRONT_DOMAIN", default=""
+)  # change this line according to your company (set your CloudFront domain)
 _csp_cdn = (f"https://{_csp_cloudfront}",) if _csp_cloudfront else ()
 
 _CSP_DIRECTIVES = {
@@ -626,21 +670,22 @@ _CSP_DIRECTIVES = {
     "script-src": ("'self'",)
     + _csp_cdn
     + (
-        "'unsafe-inline'",              # Django admin inline scripts
+        "'unsafe-inline'",  # Django admin inline scripts
         "https://accounts.google.com",  # Google Sign-In SDK
-        "https://connect.facebook.net", # Facebook JS SDK
-        "https://apis.google.com",      # Google API JS
+        "https://connect.facebook.net",  # Facebook JS SDK
+        "https://apis.google.com",  # Google API JS
     ),
     "style-src": ("'self'",) + _csp_cdn + ("'unsafe-inline'",),
     "img-src": (
         "'self'",
         "data:",
         "https:",
-        "https://lh3.googleusercontent.com",   # Google profile pictures
-        "https://avatars.githubusercontent.com", # GitHub avatars
-        "https://graph.facebook.com",           # Facebook profile pictures
-        "https://pbs.twimg.com",                # Twitter/X profile pictures
-    ) + _csp_cdn,
+        "https://lh3.googleusercontent.com",  # Google profile pictures
+        "https://avatars.githubusercontent.com",  # GitHub avatars
+        "https://graph.facebook.com",  # Facebook profile pictures
+        "https://pbs.twimg.com",  # Twitter/X profile pictures
+    )
+    + _csp_cdn,
     "font-src": ("'self'",) + _csp_cdn + ("https://fonts.gstatic.com",),
     "connect-src": (
         "'self'",
@@ -652,13 +697,13 @@ _CSP_DIRECTIVES = {
         "https://api.twitter.com",
         "https://api.github.com",
     ),
-    "media-src":  ("'self'",) + _csp_cdn,
+    "media-src": ("'self'",) + _csp_cdn,
     "object-src": ("'none'",),
-    "base-uri":   ("'self'",),
+    "base-uri": ("'self'",),
     "frame-src": (
         "'self'",
-        "https://accounts.google.com",   # Google OAuth popup (if used)
-        "https://staticxx.facebook.com", # Facebook SDK iframe
+        "https://accounts.google.com",  # Google OAuth popup (if used)
+        "https://staticxx.facebook.com",  # Facebook SDK iframe
     ),
 }
 
@@ -695,8 +740,10 @@ LOGGING = {
             "level": "WARNING",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOGS_DIR / "django.log",
-            "maxBytes": 1024 * 1024 * 15,  # 15 MB  # change this line according to your company (adjust log file size)
-            "backupCount": 10,              # change this line according to your company (adjust number of backup log files)
+            "maxBytes": 1024
+            * 1024
+            * 15,  # 15 MB  # change this line according to your company (adjust log file size)
+            "backupCount": 10,  # change this line according to your company (adjust number of backup log files)
             "formatter": "verbose",
         },
     },
