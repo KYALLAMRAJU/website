@@ -231,7 +231,7 @@ pre.traceback{{background:#1e293b;border-left:3px solid var(--fail);color:#fca5a
   </div>
   <div class="meta">
     <div>&#128197; {now}</div>
-    <div>Python 3.12 &middot; Django 5.2.8 &middot; pytest 9.0.2</div>
+    <div>Python 3.14 &middot; Django 6.0.3 &middot; pytest 9.0.2</div>
   </div>
 </div>
 

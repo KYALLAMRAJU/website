@@ -23,7 +23,7 @@ class signupForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control form-control-sm mb-4",
-                "placeholder": "Enter your Username",
+                "placeholder": "Enter your Username",  # change this line according to your company
             }
         ),
     )
@@ -32,7 +32,7 @@ class signupForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control form-control-sm mb-4",
-                "placeholder": "Enter your First name",
+                "placeholder": "Enter your First name",  # change this line according to your company
             }
         ),
     )
@@ -41,20 +41,26 @@ class signupForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control form-control-sm mb-4",
-                "placeholder": "Enter your Last name",
+                "placeholder": "Enter your Last name",  # change this line according to your company
             }
         ),
     )
     email = forms.CharField(
         label="",
         widget=forms.EmailInput(
-            attrs={"class": "form-control form-control-sm mb-4", "placeholder": "Email Address"}
+            attrs={
+                "class": "form-control form-control-sm mb-4",
+                "placeholder": "Email Address",
+            }  # change this line according to your company
         ),
     )
     password = forms.CharField(
         label="",
         widget=forms.PasswordInput(
-            attrs={"class": "form-control form-control-sm mb-4", "placeholder": "Set your Password"}
+            attrs={
+                "class": "form-control form-control-sm mb-4",
+                "placeholder": "Set your Password",
+            }  # change this line according to your company
         ),
     )
     bothandler = forms.CharField(required=False, widget=forms.HiddenInput())
@@ -220,7 +226,7 @@ class contactusForm(forms.ModelForm):
         fields = ["subject", "message"]
 
     subject = forms.ChoiceField(
-        choices=CATEGORY_CHOICES,
+        choices=CATEGORY_CHOICES,  # change this line according to your company (update choices to match your contact categories)
         label="",
         widget=forms.Select(
             attrs={
@@ -233,7 +239,7 @@ class contactusForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={
                 "class": "form-control form-control-sm mb-4",
-                "placeholder": "Enter your message here",
+                "placeholder": "Enter your message here",  # change this line according to your company
                 "rows": 8,
             }
         ),
@@ -265,5 +271,10 @@ class wishForm(forms.ModelForm):
         if not (has_alpha and has_digit):
             raise forms.ValidationError(
                 "Username should contain both alphabetic characters and numbers,(no special characters)."
+            )
+        # Check if username already exists in wishdata
+        if wishdata.objects.filter(username=username).exists():
+            raise forms.ValidationError(
+                "This username already exists. Please choose a different username."
             )
         return total_cleaned_data
