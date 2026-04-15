@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse
 from webapp.forms import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -20,8 +21,6 @@ import traceback
 from django.db import connection
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
-from webapp.api.mixin import *
-from webapp.api.utils import *
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from drf_spectacular.utils import extend_schema
