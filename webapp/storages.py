@@ -1,8 +1,8 @@
 """
-Custom S3 + CloudFront storage backends for Advaitam production.
+Custom S3 + CloudFront storage backends for Advaitam production.  # change this line according to your company (rename to your project)
 
 Architecture:
-  Single S3 bucket (advaitam-assets) with two path prefixes:
+  Single S3 bucket (advaitam-assets) with two path prefixes:  # change this line according to your company (update bucket name)
     /static/  — CSS, JS, fonts, PDFs, audio files, images
                 (long-lived, immutable cache — these are files YOU deploy, not user uploads)
     /media/   — user-uploaded content (reserved for future use;
@@ -18,13 +18,13 @@ Architecture:
     - admin/        → Django admin static files (auto-collected by collectstatic)
 
   CloudFront CDN sits in front of S3 via OAC (Origin Access Control).
-  All URLs point to the CloudFront domain (AWS_S3_CUSTOM_DOMAIN in .env)
+  All URLs point to the CloudFront domain (AWS_S3_CUSTOM_DOMAIN in .env)  # change this line according to your company
   instead of the raw S3 URL — this gives global edge caching at no extra cost.
 
   Set in .env:
     USE_S3=True
-    AWS_STORAGE_BUCKET_NAME=advaitam-assets
-    AWS_S3_CUSTOM_DOMAIN=xxxxxxxxxxxx.cloudfront.net   ← CloudFront domain
+    AWS_STORAGE_BUCKET_NAME=advaitam-assets                        # change this line according to your company (update bucket name)
+    AWS_S3_CUSTOM_DOMAIN=xxxxxxxxxxxx.cloudfront.net   ← CloudFront domain  # change this line according to your company (update CloudFront domain)
 """
 
 try:
@@ -39,13 +39,15 @@ except ImportError:
 from django.conf import settings
 
 
-class StaticStorage(S3Boto3Storage):
+class StaticStorage(
+    S3Boto3Storage
+):  # change this line according to your company (rename if needed)
     """
     Static files — files YOU deploy as part of the project (not user uploads).
     Includes: CSS, JavaScript, images, audio recitations, PDFs, fonts, Django admin files.
 
-    Stored at: s3://advaitam-assets/static/
-    Served via: https://<cloudfront-domain>/static/
+    Stored at: s3://advaitam-assets/static/   # change this line according to your company (update bucket name)
+    Served via: https://<cloudfront-domain>/static/  # change this line according to your company
     Cache: 1 year (immutable assets versioned by Django's ManifestStaticFilesStorage)
 
     Folder structure after collectstatic uploads to S3:
@@ -58,7 +60,9 @@ class StaticStorage(S3Boto3Storage):
       static/admin/       → Django admin CSS/JS/images (auto-added by collectstatic)
     """
 
-    location = "static"
+    location = (
+        "static"  # change this line according to your company (update S3 path prefix if needed)
+    )
     default_acl = None  # No public ACL — CloudFront OAC handles access
     querystring_auth = False  # No signed URLs; CloudFront delivers publicly
     file_overwrite = True  # Overwrite during collectstatic (intentional)
@@ -66,14 +70,16 @@ class StaticStorage(S3Boto3Storage):
     @property
     def custom_domain(self):
         # Use CloudFront domain from settings (populated from AWS_S3_CUSTOM_DOMAIN env var)
-        return getattr(settings, "AWS_S3_CUSTOM_DOMAIN", None)
+        return getattr(
+            settings, "AWS_S3_CUSTOM_DOMAIN", None
+        )  # change this line according to your company (update settings key if renamed)
 
 
-class MediaStorage(S3Boto3Storage):
+class MediaStorage(S3Boto3Storage):  # change this line according to your company (rename if needed)
     """
     Media files — user-uploaded content (e.g. profile pictures, user-submitted files).
-    Stored at: s3://advaitam-assets/media/
-    Served via: https://<cloudfront-domain>/media/
+    Stored at: s3://advaitam-assets/media/  # change this line according to your company (update bucket name)
+    Served via: https://<cloudfront-domain>/media/  # change this line according to your company
     Cache: 7 days (CloudFront behavior TTL)
 
     NOTE: This project currently has NO user file uploads.
@@ -83,11 +89,15 @@ class MediaStorage(S3Boto3Storage):
     not user uploads, so they go under StaticStorage above.
     """
 
-    location = "media"
+    location = (
+        "media"  # change this line according to your company (update S3 path prefix if needed)
+    )
     default_acl = None  # No public ACL — CloudFront OAC handles access
     querystring_auth = False  # No signed URLs for public content
     file_overwrite = False  # Preserve existing uploads — append unique suffix
 
     @property
     def custom_domain(self):
-        return getattr(settings, "AWS_S3_CUSTOM_DOMAIN", None)
+        return getattr(
+            settings, "AWS_S3_CUSTOM_DOMAIN", None
+        )  # change this line according to your company (update settings key if renamed)

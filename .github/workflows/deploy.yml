@@ -1,10 +1,10 @@
-name: Deploy to AWS EC2
+name: Deploy to AWS EC2  # change this line according to your company (rename workflow to match your project)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]  # change this line according to your company (update to your main branch name)
   pull_request:
-    branches: [ main ]
+    branches: [ main ]  # change this line according to your company (update to your main branch name)
 
 jobs:
 
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.12'  # change this line according to your company (update to your Python version)
 
     - name: Install ruff
       run: pip install ruff
@@ -39,11 +39,11 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16  # change this line according to your company (update to your PostgreSQL version)
         env:
-          POSTGRES_DB: advaitam_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: advaitam_test       # change this line according to your company
+          POSTGRES_USER: postgres          # change this line according to your company
+          POSTGRES_PASSWORD: postgres      # change this line according to your company
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -58,7 +58,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.12'  # change this line according to your company (update to your Python version)
 
     - name: Install dependencies
       run: |
@@ -69,10 +69,10 @@ jobs:
     - name: Run migrations
       env:
         DEBUG: False
-        SECRET_KEY: test-secret-key-not-used-in-production
-        DB_NAME: advaitam_test
-        DB_USER: postgres
-        DB_PASSWORD: postgres
+        SECRET_KEY: test-secret-key-not-used-in-production  # change this line according to your company
+        DB_NAME: advaitam_test    # change this line according to your company
+        DB_USER: postgres         # change this line according to your company
+        DB_PASSWORD: postgres     # change this line according to your company
         DB_HOST: localhost
         DB_PORT: 5432
         USE_S3: False
@@ -82,10 +82,10 @@ jobs:
     - name: Run tests
       env:
         DEBUG: False
-        SECRET_KEY: test-secret-key-not-used-in-production
-        DB_NAME: advaitam_test
-        DB_USER: postgres
-        DB_PASSWORD: postgres
+        SECRET_KEY: test-secret-key-not-used-in-production  # change this line according to your company
+        DB_NAME: advaitam_test    # change this line according to your company
+        DB_USER: postgres         # change this line according to your company
+        DB_PASSWORD: postgres     # change this line according to your company
         DB_HOST: localhost
         DB_PORT: 5432
         USE_S3: False
@@ -95,20 +95,24 @@ jobs:
     - name: Check Django
       env:
         DEBUG: False
-        SECRET_KEY: test-secret-key-not-used-in-production
-        DB_NAME: advaitam_test
-        DB_USER: postgres
-        DB_PASSWORD: postgres
+        SECRET_KEY: test-secret-key-not-used-in-production  # change this line according to your company
+        DB_NAME: advaitam_test    # change this line according to your company
+        DB_USER: postgres         # change this line according to your company
+        DB_PASSWORD: postgres     # change this line according to your company
         DB_HOST: localhost
         DB_PORT: 5432
         USE_S3: False
         SECURE_SSL_REDIRECT: False
       run: python manage.py check --deploy
 
+  # ── Job 3: Deploy ─────────────────────────────────────────────────────────
+  # Only runs on a push to main (not on pull_request).
+  # SSHes into the EC2 instance, pulls latest code, installs deps,
+  # runs migrations, collects static files, and gracefully reloads services.
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'  # change this line according to your company (update branch name)
 
     steps:
     - name: Checkout code
@@ -116,9 +120,9 @@ jobs:
 
     - name: Deploy to EC2
       env:
-        PRIVATE_KEY: ${{ secrets.AWS_EC2_PRIVATE_KEY }}
-        HOST: ${{ secrets.AWS_EC2_HOST }}
-        USER: ubuntu
+        PRIVATE_KEY: ${{ secrets.AWS_EC2_PRIVATE_KEY }}  # change this line according to your company (update secret name in GitHub)
+        HOST: ${{ secrets.AWS_EC2_HOST }}                # change this line according to your company (update secret name in GitHub)
+        USER: ubuntu                                     # change this line according to your company (update EC2 SSH username)
       run: |
         mkdir -p ~/.ssh
         echo "$PRIVATE_KEY" > ~/.ssh/deploy_key.pem
@@ -126,15 +130,15 @@ jobs:
         ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
 
         ssh -i ~/.ssh/deploy_key.pem $USER@$HOST << 'EOF'
-          cd /home/advaitam/app
-          git pull origin main
-          source /home/advaitam/venv/bin/activate
-          pip install -r requirements-prod.txt
+          cd /home/advaitam/app            # change this line according to your company (update to your app directory on server)
+          git pull origin main             # change this line according to your company (update to your branch name)
+          source /home/advaitam/venv/bin/activate  # change this line according to your company (update to your venv path)
+          pip install -r requirements-prod.txt     # change this line according to your company
           python manage.py migrate --noinput
           python manage.py collectstatic --noinput
           # Graceful reload — in-flight requests finish before workers are replaced (zero downtime)
           # 'restart' kills workers immediately; 'reload' sends SIGHUP and waits for graceful_timeout
-          sudo systemctl reload advaitam.service
+          sudo systemctl reload advaitam.service   # change this line according to your company (update to your systemd service name)
           sudo systemctl reload nginx
         EOF
 

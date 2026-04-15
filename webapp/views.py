@@ -1,9 +1,9 @@
-from django.core import paginator
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse
 from webapp.forms import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from webapp.models import *
 from django.views.generic import (
     View,
@@ -15,25 +15,17 @@ from django.views.generic import (
     DeleteView,
 )
 from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.core.mail import (
-    EmailMultiAlternatives,
     send_mail,
-    EmailMessage,
-    send_mass_mail,
-    get_connection,
-)
-from datetime import datetime, timedelta
-import random as r
+)  # BadHeaderError removed in Django 7 — use ValueError instead
 import time
-from django.utils import timezone
-import requests
-import pytz
 import traceback
-from django.conf import settings
 from django.db import connection
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema
 
 
 #  Create your views here.
@@ -90,6 +82,62 @@ def csrf_failure(request, reason=""):
     )
 
 
+# ─── CUSTOM ERROR HANDLERS ────────────────────────────────────────────────────
+# These replace Django's default white error pages with a proper UI error page.
+# Registered in webProject/urls.py as handler404, handler500, handler403, handler400.
+# NOTE: These only show when DEBUG = False in settings.py.
+#       When DEBUG = True, Django shows its own detailed debug page instead.
+
+
+def error_404(request, exception):
+    """404 - Page Not Found: user typed a wrong URL or resource doesn't exist"""
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {
+            "status_code": 404,
+            "message": "The page you are looking for does not exist or has been moved.",
+        },
+        status=404,
+    )
+
+
+def error_500(request):
+    """500 - Server Error: something crashed on the backend"""
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {"status_code": 500, "message": "Something went wrong on our end. Please try again later."},
+        status=500,
+    )
+
+
+def error_403(request, exception):
+    """403 - Forbidden: user doesn't have permission to access this page"""
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {"status_code": 403, "message": "You do not have permission to access this page."},
+        status=403,
+    )
+
+
+def error_400(request, exception):
+    """400 - Bad Request: the request sent by the browser was invalid"""
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {
+            "status_code": 400,
+            "message": "The request could not be understood. Please check the URL and try again.",
+        },
+        status=400,
+    )
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+
+
 """def cookie_refresh(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -123,9 +171,8 @@ def signupForm_view(request):
         form = signupForm(request.POST)
         if form.is_valid():
             print(
-                "All validations passed and form is valid please check forms.py for validation rules"
+                "All validations passed and signup form is valid please check forms.py for validation rules"
             )
-            # You can also access the raw POST data if needed
             print("Raw POST data:", request.POST)
             print("Cleaned data:", form.cleaned_data, type(form.cleaned_data))
             # Access individual fields using cleaned_data dictionary
@@ -135,22 +182,23 @@ def signupForm_view(request):
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
             print("Username:", username)
-            print("Name:", firstname + " " + lastname)
+            print("First Name:", firstname)
+            print("Last Name:", lastname)
             print("Email:", email)
-            print("Password:", password)
             # saving the form data into auth user table
             user = form.save()
             user.set_password(password)  # Hashing the password before saving
             user.save()
             submitted = True
+            print("✅ Signup successful for:", username)
 
             # ========== EMAIL VERIFICATION FOR SIGNUP ==========
             try:
-                subject = "Welcome to Advaitam - Verify Your Email"
+                subject = "Welcome to Advaitam - Verify Your Email"  # change this line according to your company
                 message = f"""
 Hello {firstname.capitalize()} {lastname.capitalize()},
 
-Thank you for signing up on Advaitam!
+Thank you for signing up on Advaitam!  # change this line according to your company
 
 Your account has been created successfully with the following details:
 - Username: {username}
@@ -163,7 +211,7 @@ Please keep your password safe and do not share it with anyone.
 If you did not create this account, please contact us immediately.
 
 Best regards,
-Advaitam Team
+Advaitam Team  # change this line according to your company
 """
                 # Send verification email
                 send_mail(
@@ -173,9 +221,8 @@ Advaitam Team
                     [email],
                     fail_silently=False,
                 )
-                print(f"Verification email sent successfully to {email}")
             except Exception as e:
-                print(f"Error sending email: {str(e)}")
+                print("❌ Email sending failed during signup:", e)
                 messages.warning(
                     request, f"Account created but email could not be sent. You can still login."
                 )
@@ -183,13 +230,16 @@ Advaitam Team
             # Add a success message or redirect to another page after successful signup
             messages.success(
                 request,
-                f"Account created successfully for {firstname.capitalize()}!. Verification email sent to {email}. Please login to continue.",
+                f"Account created successfully for {firstname.capitalize()}!. Verification email sent to {email}. Please login to continue.",  # change this line according to your company
             )
             # Redirect to login page after successful signup
-            return redirect("/loginpage/")
+            return redirect(
+                "/loginpage/"
+            )  # change this line according to your company (update to your login URL)
         else:
-            print("Form is invalid")
+            print("❌ Signup form is invalid")
             print(form.errors)  # printing error messages if form is invalid
+            pass  # form errors are rendered back to the template automatically
     return render(request, "htmlfiles/signupform.html", {"form": form, "submitted": submitted})
 
 
@@ -204,27 +254,24 @@ def forgotpasswordForm_view(request):
             request.POST
         )  # creating an object of LoginForm class which is of filled form if request is POST with end user data
         if form.is_valid():
-            print("Password Reset successful please login with new password")
-            print(
-                "All validations passed and form is valid please check forms.py for validation rules"
-            )
-            # You can also access the raw POST data if needed
-            print("Raw POST data:", request.POST)
-            print("Cleaned data:", form.cleaned_data, type(form.cleaned_data))
             # Access individual fields using cleaned_data dictionary
             email = form.cleaned_data["email"]
             newpassword = form.cleaned_data["newpassword"]
             confirmpassword = form.cleaned_data["confirmpassword"]
+            print(
+                "All validations passed and forgot password form is valid please check forms.py for validation rules"
+            )
             print("Email:", email)
             print("New Password:", newpassword)
-            print("Confirm New Password:", confirmpassword)
+            print("Confirm Password:", confirmpassword)
             user = User.objects.get(email=email)
             user.set_password(newpassword)
             user.save()
+            print("✅ Password reset successful for:", email)
 
             # ========== EMAIL NOTIFICATION FOR PASSWORD RESET ==========
             try:
-                subject = "Advaitam - Password Reset Successful"
+                subject = "Advaitam - Password Reset Successful"  # change this line according to your company
                 message = f"""
                             Hello {user.first_name.capitalize() if user.first_name else user.username},
                             
@@ -237,7 +284,7 @@ def forgotpasswordForm_view(request):
                             If you did not request this password reset, please contact us immediately.
                             
                             Best regards,
-                            Advaitam Team
+                            Advaitam Team  # change this line according to your company
                             """
                 # Send password reset confirmation email
                 send_mail(
@@ -247,9 +294,8 @@ def forgotpasswordForm_view(request):
                     [email],
                     fail_silently=False,
                 )
-                print(f"Password reset confirmation email sent successfully to {email}")
             except Exception as e:
-                print(f"Error sending email: {str(e)}")
+                print("❌ Email sending failed during password reset:", e)
                 messages.warning(
                     request, f"Password reset successful but confirmation email could not be sent."
                 )
@@ -257,13 +303,16 @@ def forgotpasswordForm_view(request):
             # Add a success message or redirect to another page after successful password reset
             messages.success(
                 request,
-                f"Password reset successfully for {email.split('@')[0].capitalize()}. Confirmation email sent to {email}. Please login with your new password to continue.",
+                f"Password reset successfully for {email.split('@')[0].capitalize()}. Confirmation email sent to {email}. Please login with your new password to continue.",  # change this line according to your company
             )
             # Redirect to login page after successful password reset
-            return redirect("/loginpage/")
+            return redirect(
+                "/loginpage/"
+            )  # change this line according to your company (update to your login URL)
         else:
-            print("Form is invalid")
+            print("❌ Forgot password form is invalid")
             print(form.errors)  # printing error messages if form is invalid
+            pass  # form errors are rendered back to the template automatically
     return render(request, "htmlfiles/forgotpassword.html", {"form": form})
 
 
@@ -363,13 +412,22 @@ def loginForm_view(request):
     if request.method == "POST":
         form = loginForm(request.POST)
         if form.is_valid():
+            print(
+                "All validations passed and login form is valid please check forms.py for validation rules"
+            )
+            print("Raw POST data:", request.POST)
+            print("Cleaned data:", form.cleaned_data, type(form.cleaned_data))
             email = form.cleaned_data["loginemail"]
             password = form.cleaned_data["loginpassword"]
+            print("Email:", email)
+            print("Password:", password)
             try:
                 user_obj = User.objects.get(email=email)
                 username = user_obj.username
+                print("Username found:", username)
             except User.DoesNotExist:
                 username = None
+                print("❌ User not found for email:", email)
                 messages.error(
                     request,
                     "User not found ! Please check your entered data once again or sign up using signup link at bottom.",
@@ -379,13 +437,26 @@ def loginForm_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Welcome , {username}!")
-                return redirect(request.GET.get("next", "/home/"))
+                print("✅ Login successful for:", username)
+                messages.success(
+                    request, f"Welcome , {username}!"
+                )  # change this line according to your company (customize welcome message)
+                return redirect(
+                    request.GET.get("next", "/home/")
+                )  # change this line according to your company (update post-login redirect URL)
             else:
+                print(
+                    "❌ Authentication failed for:",
+                    username,
+                    "(wrong password or inactive account)",
+                )
                 messages.error(
                     request,
                     "Password is wrong or account is inactive.If you don't have an account, please sign up using signup link at bottom.",
                 )
+        else:
+            print("❌ Login form is invalid")
+            print(form.errors)  # printing error messages if form is invalid
     return render(request, "htmlfiles/login.html", {"form": form})
 
 
@@ -408,6 +479,7 @@ def session_ping(request):
 
 @login_required
 def homepage_view(request):  # Accessing username from session
+    print("✅ Homepage accessed by user:", request.user.username)
     return render(request, "htmlfiles/home.html")
 
 
@@ -472,10 +544,8 @@ def contact_view(request):
                 admin_email = settings.ADMIN_EMAIL
                 user_email = email.strip() if email else None
 
-                print(f"[contact_view] admin_email={admin_email}, user_email={user_email}")
-
                 # ── Email 1: Notify admin ──────────────────────────────────────
-                admin_subject = f"[Advaitam Contact] {subject} - from {name}"
+                admin_subject = f"[Advaitam Contact] {subject} - from {name}"  # change this line according to your company
                 admin_body = (
                     f"You have received a new contact message from:\n\n"
                     f"Name   : {name}\n"
@@ -490,18 +560,17 @@ def contact_view(request):
                     [admin_email],
                     fail_silently=False,
                 )
-                print(f"[contact_view] Admin email sent to {admin_email}")
 
                 # ── Email 2: Confirmation to user (only if different from admin) ──
                 if user_email and user_email.lower() != admin_email.lower():
                     time.sleep(1.5)  # Mailtrap free plan: max 1 email/second
-                    user_subject = "Advaitam - We received your message!"
+                    user_subject = "Advaitam - We received your message!"  # change this line according to your company
                     user_body = (
                         f"Dear {name.title()},\n\n"
-                        f"Thank you for reaching out to us. We have received your message "
+                        f"Thank you for reaching out to us. We have received your message "  # change this line according to your company
                         f'regarding "{subject}" and will get back to you soon.\n\n'
                         f"Your message:\n{message}\n\n"
-                        f"Best regards,\nAdvaitam Team"
+                        f"Best regards,\nAdvaitam Team"  # change this line according to your company
                     )
                     send_mail(
                         user_subject,
@@ -510,9 +579,6 @@ def contact_view(request):
                         [user_email],
                         fail_silently=False,
                     )
-                    print(f"[contact_view] Confirmation email sent to {user_email}")
-
-                print(f"[contact_view] All emails sent successfully")
                 return JsonResponse(
                     {
                         "status": "success",
@@ -521,7 +587,6 @@ def contact_view(request):
                 )
             except Exception as e:
                 traceback.print_exc()
-                print(f"[contact_view] ERROR: {e}")
                 return JsonResponse(
                     {
                         "status": "error",
@@ -530,7 +595,6 @@ def contact_view(request):
                     status=500,
                 )
         else:
-            print("[contact_view] Form invalid:", form.errors)
             return JsonResponse(
                 {"status": "error", "message": "Please fill in all required fields correctly."},
                 status=400,
@@ -538,56 +602,25 @@ def contact_view(request):
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
-# """ -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"""
-
 # ----------------------------------------------THE BELOW ONES ARE FOR MY PRACTICE.[CRUD USING FUNCTION BASED VIEWS] USING FUNCTION BASED VIEWS-------------------------------------------------
-
-
-def wish_insertview(request):
-    form = wishForm()
-    if request.method == "POST":
-        form = wishForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("/wish/")
-    return render(request, "htmlfiles/wishinsert.html", {"form": form})
-
-
-def wish_updateview(request, id):
-    wish = wishdata.objects.get(id=id)  # to get record matched with the id
-    form = wishForm(instance=wish)
-    if request.method == "POST":
-        form = wishForm(request.POST, instance=wish)
-        if form.is_valid():
-            form.save()
-            return redirect("/wish/")
-    return render(request, "htmlfiles/wishupdate.html", {"form": form})
-
-
-def wish_deleteview(request, id):
-    wish = wishdata.objects.get(id=id)  # to get record matched wish data with the id
-    wish.delete()
-    return redirect("/wish/")
-
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def wish_retrieveview(request):
-    # print(request.COOKIES)
+    print(request.COOKIES)
     # count = int(request.COOKIES.get('count', 0))
     # count += 1
-    # wish_list=wishdata.objects.all() # To get list of all the data in the table
+    wish_list = wishdata.objects.all()  # To get list of all the data in the table
     # wish_list = wishdata.objects.filter(name__startswith='A')  # Django ORM code to fetch all records from wishdata table whose name starts with A
-    wish_list = wishdata.objects.all().values_list("id", "name", "astrology_message")
-    # print(wish_list)
+    # wish_list = wishdata.objects.all().values_list("id", "name", "astrology_message")
+    print(wish_list)
     paginator = Paginator(
         wish_list, 8
     )  # 10 records per page #create an object of paginator class with what data u want to use for pagination and how many records per page
     page_number = request.GET.get(
         "page"
     )  # getting the current page number from url query parameter which we passed from pagination.html file next and previous links
-    print(page_number)
     try:
         wish_list = paginator.page(
             page_number
@@ -605,7 +638,54 @@ def wish_retrieveview(request):
     return response
 
 
+def wish_insertview(request):
+    form = wishForm()
+    if request.method == "POST":
+        form = wishForm(request.POST)
+        if form.is_valid():
+            print("Wish form is valid, saving data to database")
+            print("Cleaned data:", form.cleaned_data)
+            form.save()
+            print("✅ Wish data saved successfully")
+            return redirect("/wish/")
+        else:
+            print("❌ Wish form is invalid")
+            print(form.errors)
+    return render(request, "htmlfiles/wishinsert.html", {"form": form})
+
+
+def wish_updateview(request, id):
+    wish = wishdata.objects.get(id=id)  # to get record matched with the id
+    print("Fetched wish data for update:", wish.id, wish.name)
+    form = wishForm(instance=wish)
+    if request.method == "POST":
+        form = wishForm(request.POST, instance=wish)
+        if form.is_valid():
+            print("Wish update form is valid, saving updated data to database")
+            print("Updated cleaned data:", form.cleaned_data)
+            form.save()
+            print("✅ Wish data updated successfully for id:", id)
+            return redirect("/wish/")
+        else:
+            print("❌ Wish update form is invalid")
+            print(form.errors)
+    return render(request, "htmlfiles/wishupdate.html", {"form": form})
+
+
+def wish_deleteview(request, id):
+    wish = wishdata.objects.get(id=id)  # to get record matched wish data with the id
+    print("Deleting wish data for id:", id, "Name:", wish.name)
+    wish.delete()
+    print("✅ Wish data deleted successfully for id:", id)
+    return redirect("/wish/")
+
+
 # ------------------------------------------------THE BELOW ONES ARE FOR MY PRACTICE.[CLASS BASED VIEWS ]-------------------------------------------------------------
+class Helloworldview(View):
+    def get(self, request):
+        return HttpResponse(
+            "Hello World! This is my first class based view in Django."
+        )  # there is no template file associated with this view just returning a simple http response
 
 
 # THE BELOW ONE IS A NORMAL VIEW CLASS BASED VIEW FOR RETRIEVING WISH DATA
@@ -613,13 +693,6 @@ class Wishgetview(View):
     def get(self, request):
         wish_list = wishdata.objects.all()
         return render(request, "htmlfiles/wish.html", {"wish_list": wish_list})
-
-
-class Helloworldview(View):
-    def get(self, request):
-        return HttpResponse(
-            "Hello World! This is my first class based view in Django."
-        )  # there is no template file associated with this view just returning a simple http response
 
 
 # THE BELOW ONE IS A TEMPLATE VIEW CLASS BASED VIEW FOR RETRIEVING WISH DATA
@@ -681,740 +754,3 @@ class wishdetailview(DetailView):
     model = wishdata
     # default template name is 'webapp/wishdata_detail.html'
     # default context object: wishdata(modelclassname) or object
-
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# -----------------BELOW IS THE CODE FOR MY PRACTICE PURPOSE ONLY: DJANGO [REST API] THIS BELOW SECTION IS WITHOUT REST API -----------------------------
-
-from webapp.mixin import *
-from webapp.utils import *
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-
-
-def wish_api_view1(request):
-    wish_list = wishdata.objects.all().values(
-        "id", "username", "name", "astrology_message", "mobilenumber"
-    )
-    wish_data = list(wish_list)
-    json_data = json.dumps(wish_data, indent=4)
-    return HttpResponse(json_data, content_type="application/json")
-
-
-def wish_api_view2(request):
-    wish_list = wishdata.objects.all().values(
-        "id", "username", "name", "astrology_message", "mobilenumber"
-    )  # Fetch all wishdata records as dictionaries i.e.queryset of dictionaries
-    wish_data = list(wish_list)  # Convert QuerySet to a list of dictionaries
-    return JsonResponse(
-        wish_data, safe=False, content_type="application/json", json_dumps_params={"indent": 4}
-    )  # Return as JSON response with indentation for readability
-
-
-# ------------------------------------------------------ #delete,get,post using mixin and put using normal httpresponse----------------------------------------------------
-class test(HTTPResponseMixin, View):
-    def delete(self, request, *args, **kwargs):
-        json_data = json.dumps(
-            {"msg": "Hello World! This is my first API using Class Based Views using delete method"}
-        )
-        return self.render_to_http_response(json_data)
-
-    def get(self, request, *args, **kwargs):
-        json_data = json.dumps(
-            {"msg": "Hello World! This is my first API using Class Based Views using get method"}
-        )
-        return self.render_to_http_response(json_data)
-
-    def post(self, request, *args, **kwargs):
-        json_data = json.dumps(
-            {"msg": "Hello World! This is my first API using Class Based Views using post method"}
-        )
-        return self.render_to_http_response(json_data)
-
-    def put(self, request, *args, **kwargs):
-        json_data = json.dumps(
-            {"msg": "Hello World! This is my first API using Class Based Views using put method"}
-        )
-        return HttpResponse(json_data, content_type="application/json")
-
-
-class jsonCBV1(HTTPResponseMixin, View):
-    def get(self, request, *args, **kwargs):
-        try:
-            wish_list = wishdata.objects.all().values(
-                "id", "username", "name", "astrology_message", "mobilenumber"
-            )  # Fetch all wishdata records as dictionaries i.e.queryset of dictionaries
-            wish_data = list(wish_list)  # Convert QuerySet to a list of dictionaries
-            json_data = json.dumps(wish_data, indent=4)
-            return self.render_to_http_response(json_data)
-        except wishdata.DoesNotExist:
-            error_msg = {"error": "The requested wish data is not available"}
-            json_data = json.dumps(error_msg, indent=4)
-            return self.render_to_http_response(json_data, status=404)
-
-
-class jsonCBV2(JSONResponseMixin, View):
-    def get(self, request, *args, **kwargs):
-        wish_list = (
-            wishdata.objects.all().values()
-        )  # Fetch all wishdata records as dictionaries i.e.queryset of dictionaries
-        wish_data = list(wish_list)  # Convert QuerySet to a list of dictionaries
-        return self.render_to_json_response(wish_data)
-
-
-# ---------------------------------------------------------------USING CBV AND  MIXINS TO RETURN WISH DATA AS JSON RESPONSE--------------------------------------------------------
-@method_decorator(csrf_exempt, name="dispatch")
-class jsonCBV(JSONResponseMixin, View, reusable, HTTPResponseMixin):
-    def get(self, request, id, *args, **kwargs):
-        try:
-            wish_list = wishdata.objects.get(id=id)
-            dict_wish_list = {
-                "id": wish_list.id,
-                "username": wish_list.username,
-                "name": wish_list.name,
-                "astrology_message": wish_list.astrology_message,
-                "mobilenumber": wish_list.mobilenumber,
-            }
-            return self.render_to_json_response(dict_wish_list, status=200)
-        except wishdata.DoesNotExist:
-            error_msg = {
-                "error": "The requested wish data is not available please check the id once again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-
-    def put(self, request, id, *args, **kwargs):
-        incomingdata = request.body
-        print(incomingdata)
-        valid_jsondata = self.is_json(incomingdata)
-        if not valid_jsondata:
-            error_msg = {"error": "Please provide valid json data"}
-            return self.render_to_json_response(error_msg, status=400)
-
-        wish_obj = self.get_object_by_id(
-            id
-        )  # here the data is in the form of object and the data must be converted into dictionary to update with the new data provided by the user
-        if wish_obj is None:
-            error_msg = {
-                "error": "The requested wish data is not available,please check the id once again and try again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-
-        provided_data = json.loads(incomingdata)
-        print(provided_data)  # this provided data is for updating the existing data
-
-        original_data = {
-            "username": wish_obj.username,
-            "name": wish_obj.name,
-            "astrology_message": wish_obj.astrology_message,
-            "mobilenumber": wish_obj.mobilenumber,
-        }
-        original_data.update(provided_data)
-        print(
-            original_data
-        )  # this original data is for updating the existing data with new data provided by the user
-        form = wishForm(original_data, instance=wish_obj)
-        if form.is_valid():
-            form.save(commit=True)
-            success_msg = {"msg": "Wish data updated successfully with new entry"}
-            return self.render_to_json_response(success_msg, status=200)
-        if form.errors:
-            return self.render_to_json_response(form.errors, status=400)
-
-    def delete(self, request, id, *args, **kwargs):
-        wish_obj = self.get_object_by_id(id)
-        if wish_obj is None:
-            error_msg = {
-                "error": "The requested wish data is not available,please check the id once again and try again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-        status, deleted_obj = wish_obj.delete()
-        print(status, deleted_obj)
-        if status == 1:
-            success_msg = {"msg": "Wish data deleted successfully"}
-            return self.render_to_json_response(success_msg, status=200)
-        error_msg = {"error": "Unable to delete the requested wish data,please try again later"}
-        return self.render_to_json_response(error_msg, status=500)
-
-
-# ---------------------using django serializers module to convert queryset to json data-----------------------------------------------
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class serializemetaCBV(HTTPResponseMixin, JSONResponseMixin, View, reusable):
-    def get(self, request, *args, **kwargs):
-        wish_list = wishdata.objects.all()
-        if not wish_list.exists():
-            error_msg = {
-                "error": "The requested wish data is not available,please add the data and check again"
-            }
-            return JsonResponse(error_msg, content_type="application/json", status=404)
-        jsondata = serialize("json", wish_list)
-        return self.render_to_http_response(jsondata)
-
-    def post(self, request, *args, **kwargs):
-        valid_jsondata = self.is_json(request.body)
-        if not valid_jsondata:
-            error_msg = {"error": "Please provide valid json data"}
-            return self.render_to_json_response(error_msg, status=400)
-        wishdata = json.loads(request.body)
-        print(wishdata)
-        form = wishForm(wishdata)
-        if form.is_valid():
-            form.save()
-            success_msg = {"msg": "Wish data created and inserted into db successfully"}
-            return self.render_to_json_response(success_msg, status=201)
-        if form.errors:
-            json_data = json.dumps(form.errors, indent=4)
-            return self.render_to_http_response(json_data, status=400)
-
-
-class serializesingleCBV(SerializeMixin, View):
-    def get(self, request, *args, **kwargs):
-        wish_list = wishdata.objects.all()
-        if not wish_list.exists():
-            error_msg = {
-                "error": "The requested wish data is not available,please add the data and check again"
-            }
-            return JsonResponse(error_msg, content_type="application/json", status=404)
-        jsondata = self.serialize(wish_list)
-        return HttpResponse(jsondata, content_type="application/json")
-
-
-# -----------------------------------------------CRUD OPERATIONS USING SINGLE ENDPOINT-------------------------------------------------------------
-@method_decorator(csrf_exempt, name="dispatch")
-class crudCBV(View, HTTPResponseMixin, JSONResponseMixin, SerializeMixin, reusable):
-    def get(self, request, *args, **kwargs):
-        incomingreqdata = request.body
-        valid_json = self.is_json(incomingreqdata)
-        if not valid_json:
-            error_msg = {"error": "Please provide valid json data"}
-            return self.render_to_json_response(error_msg, status=400)
-        p_data = json.loads(incomingreqdata)
-        id = p_data.get("id", None)
-        if id is not None:
-            wish_obj = self.get_object_by_id(id)
-            if wish_obj is None:
-                error_msg = {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                }
-                return self.render_to_json_response(error_msg, status=404)
-            jsondata = self.serialize([wish_obj])
-            return self.render_to_http_response(jsondata)
-        qs = wishdata.objects.all()
-        if not qs.exists():
-            error_msg = {
-                "error": "The requested wish data is not available,please add the data and check again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-        fullop = self.serialize(qs)
-        return HttpResponse(fullop, content_type="application/json")
-
-    def post(self, request, *args, **kwargs):
-        valid_jsondata = self.is_json(request.body)
-        if not valid_jsondata:
-            error_msg = {"error": "Please provide valid json data"}
-            return self.render_to_json_response(error_msg, status=400)
-        wishdata = json.loads(request.body)
-        print(wishdata)
-        form = wishForm(wishdata)
-        if form.is_valid():
-            form.save()
-            success_msg = {"msg": "Wish data created and inserted into db successfully"}
-            return self.render_to_json_response(success_msg, status=201)
-        if form.errors:
-            json_data = json.dumps(form.errors, indent=4)
-            return self.render_to_http_response(json_data, status=400)
-
-    def put(self, request, *args, **kwargs):
-        incomingreqdata = request.body
-        valid_json = self.is_json(incomingreqdata)
-        if not valid_json:
-            error_msg = {"error": "Please provide valid json data"}
-            return self.render_to_json_response(error_msg, status=400)
-
-        p_data = json.loads(incomingreqdata)
-        id = p_data.get("id", None)
-        if id is None:
-            error_msg = {
-                "error": "To update please provide the id also or else pass correct id for update operation"
-            }
-            return self.render_to_json_response(error_msg, status=400)
-        wish_obj = self.get_object_by_id(id)
-        if wish_obj is None:
-            error_msg = {
-                "error": "The requested wish data is not available,please check the id once again and try correct id again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-        original_data = {
-            "username": wish_obj.username,
-            "name": wish_obj.name,
-            "astrology_message": wish_obj.astrology_message,
-            "mobilenumber": wish_obj.mobilenumber,
-        }
-        original_data.update(p_data)
-        print(
-            original_data
-        )  # this original data is for updating the existing data with new data provided by the user
-        form = wishForm(original_data, instance=wish_obj)
-        if form.is_valid():
-            form.save(commit=True)
-            success_msg = {"msg": "Wish data updated successfully with new entry"}
-            return self.render_to_json_response(success_msg, status=200)
-        if form.errors:
-            return self.render_to_json_response(form.errors, status=400)
-
-    def delete(self, request, *args, **kwargs):
-        incomingreqdata = request.body
-        valid_json = self.is_json(incomingreqdata)
-        if not valid_json:
-            error_msg = {"error": "Please provide valid json data"}
-            return self.render_to_json_response(error_msg, status=400)
-
-        p_data = json.loads(incomingreqdata)
-        id = p_data.get("id", None)
-        if id is None:
-            error_msg = {
-                "error": "To update please provide the id also or else pass correct id for update operation"
-            }
-            return self.render_to_json_response(error_msg, status=400)
-        wish_obj = self.get_object_by_id(id)
-        if wish_obj is None:
-            error_msg = {
-                "error": "The requested wish data is not available,please check the id once again and try correct id again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-        status, deleted_obj = wish_obj.delete()
-        print(status, deleted_obj)
-        if status == 1:
-            success_msg = {"msg": "Wish data deleted successfully"}
-            return self.render_to_json_response(success_msg, status=200)
-        error_msg = {"error": "Unable to delete the requested wish data,please try again later"}
-        return self.render_to_json_response(error_msg, status=500)
-
-
-# ----------------------------------------------DJANGO [SERIALIZERS & DE-SERIALIZERS] -------------------------------------------------------------
-import io
-from webapp.serializers import *
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class DRFCRUDCBV(View, HTTPResponseMixin, JSONResponseMixin, SerializeMixin, reusable):
-    def get(self, request, *args, **kwargs):
-        incomingdata = request.body
-        stream = io.BytesIO(incomingdata)
-        p_data = JSONParser().parse(stream)
-        id = p_data.get("id", None)
-        if id is not None:
-            wish_obj = self.get_object_by_id(id)
-            if wish_obj is None:
-                error_msg = {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                }
-                return self.render_to_json_response(error_msg, status=404)
-            serializer = wishserializer(wish_obj).data
-            jsondata = JSONRenderer().render(serializer)
-            return self.render_to_http_response(jsondata)
-        qs = wishdata.objects.all()
-        qsserializer = wishserializer(qs, many=True).data
-        qsjsondata = JSONRenderer().render(qsserializer)
-        return self.render_to_http_response(qsjsondata)
-
-    def post(self, request, *args, **kwargs):
-        incomingdata = request.body
-        stream = io.BytesIO(incomingdata)
-        p_data = JSONParser().parse(stream)
-        serializer = wishserializer(data=p_data)
-        if serializer.is_valid():
-            serializer.save()
-            success_msg = {"msg": "Wish data created and inserted into db successfully"}
-            return self.render_to_json_response(success_msg, status=201)
-        if serializer.errors:
-            json_data = JSONRenderer().render(serializer.errors)
-            return self.render_to_http_response(json_data, status=400)
-
-    def put(self, request, *args, **kwargs):
-        incomingdata = request.body
-        stream = io.BytesIO(incomingdata)
-        p_data = JSONParser().parse(stream)
-        id = p_data.get("id", None)
-        if id is None:
-            error_msg = {
-                "error": "To update please provide the id also or else pass correct id for update operation"
-            }
-            return self.render_to_json_response(error_msg, status=400)
-        wish_obj = self.get_object_by_id(id)
-        if wish_obj is None:
-            error_msg = {
-                "error": "The requested wish data is not available,please check the id once again and try correct id again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-        serializer = wishserializer(wish_obj, data=p_data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            success_msg = {"msg": "Wish data updated successfully with new entry"}
-            return self.render_to_json_response(success_msg)
-        if serializer.errors:
-            json_data = JSONRenderer().render(serializer.errors)
-            return self.render_to_http_response(json_data, status=400)
-
-    def delete(self, request, *args, **kwargs):
-        incomingdata = request.body
-        stream = io.BytesIO(incomingdata)
-        p_data = JSONParser().parse(stream)
-        id = p_data.get("id", None)
-        if id is None:
-            error_msg = {
-                "error": "To delete please provide the id also or else pass correct id for update operation"
-            }
-            return self.render_to_json_response(error_msg, status=400)
-        wish_obj = self.get_object_by_id(id)
-        if wish_obj is None:
-            error_msg = {
-                "error": "The requested wish data is not available,please check the id once again and try correct id again"
-            }
-            return self.render_to_json_response(error_msg, status=404)
-        status, deleted_obj = wish_obj.delete()
-        print(status, deleted_obj)
-        if status == 1:
-            success_msg = {"msg": "Wish data deleted successfully"}
-            return self.render_to_json_response(success_msg, status=200)
-        error_msg = {"error": "Unable to delete the requested wish data,please try again later"}
-        return self.render_to_json_response(error_msg, status=500)
-
-
-# -------------------------------------------------------DRF API VIEWS------------------------------------------------------------------------------------
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-
-
-class DRFAPIVIEW(APIView, reusable):
-    def get(self, request, id=None, *args, **kwargs):
-        if id is not None:
-            wish_obj = self.get_object_by_id(id)
-            if wish_obj is None:
-                return Response(
-                    {
-                        "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                    },
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            serializer = wishserializer(wish_obj).data
-            return Response(serializer, status=status.HTTP_200_OK)
-        qs = wishdata.objects.all()
-        if not qs.exists():
-            return Response(
-                {
-                    "error": "The requested query set data is not available,please add the query set and check again"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        qsserializer = wishserializer(qs, many=True).data
-        return Response(qsserializer, status=status.HTTP_200_OK)
-
-    def post(self, request, *args, **kwargs):
-        serializer = wishserializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"msg": "Wish data created and inserted into db successfully"},
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, *args, **kwargs):
-        id = request.data.get("id", None)
-        if id is None:
-            return Response(
-                {
-                    "error": "To update please provide the id also or else pass correct id for update operation"
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        wish_obj = self.get_object_by_id(id)
-        # wish_obj=get_object_or_404(wishdata,id=id)
-        if wish_obj is None:
-            return Response(
-                {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        serializer = wishserializer(wish_obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"msg": "Wish data updated successfully with new entry"}, status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, id=None, *args, **kwargs):
-        if id is None:
-            return Response(
-                {
-                    "error": "To delete please provide the id also or else pass correct id for update operation"
-                }
-            )
-        wish_obj = self.get_object_by_id(id)
-        if wish_obj is None:
-            return Response(
-                {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                }
-            )
-        status, deleted_obj = wish_obj.delete()
-        print(status, deleted_obj)
-        if status == 1:
-            return Response({"msg": "Wish data deleted successfully"})
-        return Response(
-            {"error": "Unable to delete the requested wish data,please try again later"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-# ----------------------------USING IN-BUILT APIVIEW CLASSES [LISTAPIVIEW,CREATEAPIVIEW,RETRIEVEAPIVIEW,UPDATEAPIVIEW,DESTROYAPIVIEW]----------------------------------------------
-# -----NO NEED TO WRITE THE LOGIC FOR GET,POST,PUT,DELETE METHODS LIKE ABOVE CODE-----#
-
-from rest_framework.generics import (
-    ListAPIView,
-    CreateAPIView,
-    RetrieveAPIView,
-    UpdateAPIView,
-    DestroyAPIView,
-    RetrieveUpdateDestroyAPIView,
-    ListCreateAPIView,
-)
-from webapp.pagination import mypagination, mypagination2
-
-
-class DRFInbuiltAPIViews1(ListCreateAPIView):
-    queryset = wishdata.objects.all()
-    serializer_class = wishserializer
-    # def get_queryset(self):#to override the queryset with the custom filtering based on name query parameter use ?name=xyz in the url :-- THIS IS CALLED PLAIN VANILLA FILTERING
-    #     qs = wishdata.objects.all()
-    #     name = self.request.GET.get('name')
-    #     if name is not None:
-    #         qs = qs.filter(name__icontains=name)
-    #     return qs
-    search_fields = [
-        "name"
-    ]  # to enable search functionality based on name field using ?search=xyz in the url :-- THIS IS CALLED DRF INBUILT SEARCH FILTERING
-    pagination_class = mypagination2
-
-
-class DRFInbuiltAPIViews2(RetrieveUpdateDestroyAPIView):
-    queryset = wishdata.objects.all()
-    serializer_class = wishserializer
-
-
-class DRFInbuiltAPIViews3(ListCreateAPIView):
-    queryset = author.objects.all()
-    serializer_class = authorSerializer
-
-
-class DRFInbuiltAPIViews4(RetrieveUpdateDestroyAPIView):
-    queryset = author.objects.all()
-    serializer_class = authorSerializer
-
-
-class DRFInbuiltAPIViews5(ListCreateAPIView):
-    queryset = book.objects.all()
-    serializer_class = bookSerializer
-
-
-class DRFInbuiltAPIViews6(RetrieveUpdateDestroyAPIView):
-    queryset = book.objects.all()
-    serializer_class = bookSerializer
-
-
-# -----------------------------------------------------USING DRF VIEWSETS------------------------------------------------------------------------------------
-from rest_framework.viewsets import ViewSet
-
-
-class DRFViewSet(ViewSet, reusable):
-    def list(self, request, *args, **kwargs):
-        qs = wishdata.objects.all()
-        if not qs.exists():
-            return Response(
-                {
-                    "error": "The requested query set data is not available,please add the query set and check again"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        qsserializer = wishserializer(qs, many=True).data
-        return Response(qsserializer, status=status.HTTP_200_OK)
-
-    def create(self, request, *args, **kwargs):
-        serializer = wishserializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"msg": "Wish data created and inserted into db successfully"},
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def update(self, request, pk=None, *args, **kwargs):
-        if pk is None:
-            return Response(
-                {
-                    "error": "To update please provide the id also or else pass correct id for update operation"
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        wish_obj = self.get_object_by_id(pk)
-        if wish_obj is None:
-            return Response(
-                {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        serializer = wishserializer(wish_obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"msg": "Wish data updated successfully with new entry"}, status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request, pk=None, *args, **kwargs):
-        if pk is None:
-            return Response(
-                {
-                    "error": "To update please provide the id also or else pass correct id for update operation"
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        wish_obj = self.get_object_by_id(pk)
-        if wish_obj is None:
-            return Response(
-                {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        serializer = wishserializer(wish_obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"msg": "Wish data updated successfully with new entry"}, status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        wish_obj = self.get_object_by_id(pk)
-        if wish_obj is None:
-            return Response(
-                {
-                    "error": "The requested wish data is not available,please check the id once again and try correct id again"
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        serializer = wishserializer(wish_obj).data
-        return Response(serializer, status=status.HTTP_200_OK)
-
-
-# ---------------------------------USING MODEL BASED VIEWSETS------------------------------------------------------------------------------------
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.authentication import (
-    TokenAuthentication,
-    BasicAuthentication,
-    SessionAuthentication,
-)
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAdminUser,
-    AllowAny,
-    IsAuthenticatedOrReadOnly,
-    DjangoModelPermissions,
-    DjangoModelPermissionsOrAnonReadOnly,
-)
-from webapp.custompermission import mypermission1
-from rest_framework_simplejwt.authentication import JWTAuthentication
-
-
-class DRFModelViewSet(ModelViewSet):
-    queryset = wishdata.objects.all()
-    serializer_class = wishserializer
-    # -------------------------------------------------The below are for local testing of token authentication and permission classes------------------------------------------------
-    # authentication_classes = [BasicAuthentication,]  # enabling basic authentication for this viewset
-    authentication_classes = [
-        SessionAuthentication,
-    ]  # enabling session authentication for this viewset
-    # authentication_classes = [TokenAuthentication,]  # enabling token authentication for this viewset
-    # authentication_classes = [JWTAuthentication,]  # enabling JWT authentication for this viewset
-    # permission_classes = [AllowAny] # anyone can access the API endpoints if there is global setting then it will override that setting
-    # permission_classes = [IsAuthenticated] #only authenticated users can access the API endpoints
-    # permission_classes = [IsAdminUser] #only admin users can access the API endpoints who should have staff status true
-    # permission_classes=[IsAuthenticatedOrReadOnly] #authenticated users can perform write operations and unauthenticated users can perform read operations only like IRCTC website: anyone can see the train details without login but to book the tickets login is required
-    # permission_classes = [DjangoModelPermissions] #permissions based on django model permissions (add,change,delete,view) assigned to the user in the admin panel: can assign add/change/delete/view permissions to a user for a particular model in the admin panel and that user can perform those operations only
-    # permission_classes = [DjangoModelPermissionsOrAnonReadOnly] #authenticated users can perform write operations based on their model permissions and unauthenticated users can perform read operations only
-    permission_classes = [
-        IsAuthenticated
-    ]  # custom permission class defined in custompermission.py file
-
-
-# --------------------------------------------------------------------CLAUDE SERVICE VIEWS-------------------------------------------------------------------------------
-from webapp.services.claude_service import ClaudeService
-
-
-@csrf_exempt
-def claude_api(request):
-
-    if request.method != "POST":
-        return JsonResponse({"error": "POST only"})
-
-    data = json.loads(request.body)
-    prompt = data.get("prompt")
-
-    service = ClaudeService()
-    result = service.ask(prompt)
-
-    return JsonResponse({"response": result})
-
-
-def claude_page(request):
-    return render(request, "htmlfiles/claude_chat.html")
-
-
-# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# """def wish_view(request):
-#     print(request.COOKIES)
-#     count=request.session.get('count', 0) #everything happening at server side using sessions #GETTER
-#     count+=1
-#     request.session['count'] = count        #SETTER
-#     wish_list = wishdata.objects.all()  # To get list of all the data in the table
-#     return render(request, 'htmlfiles/wish.html', {'count': count,'wish_list': wish_list})
-#
-#
-#
-# def books_view(request):
-#     books_list=books.objects.all()   #Django ORM code to fetch all records from books table
-#     print(books_list)
-#     my_dict={'books_list':books_list}
-#     return render(request, 'htmlfiles/books.html', context=my_dict)"""
-#
-# """def wish_view(request):
-#     date=datetime.datetime.now()
-#     msg="Hello Friend"
-#     hour=int(date.strftime('%H'))
-#     if hour<12:
-#         msg+=" Good Morning"
-#     elif hour<16:
-#         msg+=" Good Afternoon"
-#     elif hour<20:
-#         msg+=" Good Evening"
-#     else:
-#         msg+=" Good Night"
-#     user=['kalyan']
-#     names_list=['Ravi','Raju','Sonu','Monu','Sonu','Anu','Manu','Pooja']
-#     astrology_list=['You will have a great day!','Success is on the horizon.','Expect the unexpected.','Today is a perfect day to try something new.','Good fortune will come your way.']
-#     user=r.choice(user)
-#     namechoice=r.choice(names_list)
-#     astrology_message=r.choice(astrology_list)
-#     my_dict={'date':date,'msg':msg,'names':namechoice,'astrology_message':astrology_message,'user':user}
-#     return render(request, 'htmlfiles/wish.html', context=my_dict)"""

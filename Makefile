@@ -1,4 +1,4 @@
-# ========== ADVAITAM — MAKEFILE ==========
+# ========== ADVAITAM — MAKEFILE ==========  # change this line according to your company (rename to your project)
 # Standard developer shortcuts. Run `make help` to see all targets.
 #
 # Usage:
@@ -13,8 +13,8 @@
 PYTHON     := python
 MANAGE     := $(PYTHON) manage.py
 PIP        := pip
-APP        := webapp
-PORT       := 8000
+APP        := webapp   # change this line according to your company (update to your app name)
+PORT       := 8000     # change this line according to your company (update dev server port if needed)
 
 .DEFAULT_GOAL := help
 
@@ -157,12 +157,12 @@ check: lint format
 # ── Deployment ────────────────────────────────────────────────────────────────
 .PHONY: deploy
 deploy:
-	@echo "Pushing to main branch → triggers GitHub Actions CI/CD..."
-	git push origin main
+	@echo "Pushing to main branch → triggers GitHub Actions CI/CD..."  # change this line according to your company (update branch name)
+	git push origin main  # change this line according to your company (update to your branch name)
 
 .PHONY: health
 health:
-	curl -s http://localhost:$(PORT)/health/ | python -m json.tool
+	curl -s http://localhost:$(PORT)/health/ | python -m json.tool  # change this line according to your company (update health check URL)
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 .PHONY: install
