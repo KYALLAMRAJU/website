@@ -15,7 +15,9 @@ from django.views.generic import (
     DeleteView,
 )
 from django.urls import reverse_lazy
-from django.core.mail import send_mail  # BadHeaderError removed in Django 7 — use ValueError instead
+from django.core.mail import (
+    send_mail,
+)  # BadHeaderError removed in Django 7 — use ValueError instead
 import time
 import traceback
 from django.db import connection
@@ -86,36 +88,53 @@ def csrf_failure(request, reason=""):
 # NOTE: These only show when DEBUG = False in settings.py.
 #       When DEBUG = True, Django shows its own detailed debug page instead.
 
+
 def error_404(request, exception):
     """404 - Page Not Found: user typed a wrong URL or resource doesn't exist"""
-    return render(request, "htmlfiles/error.html", {
-        "status_code": 404,
-        "message": "The page you are looking for does not exist or has been moved."
-    }, status=404)
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {
+            "status_code": 404,
+            "message": "The page you are looking for does not exist or has been moved.",
+        },
+        status=404,
+    )
 
 
 def error_500(request):
     """500 - Server Error: something crashed on the backend"""
-    return render(request, "htmlfiles/error.html", {
-        "status_code": 500,
-        "message": "Something went wrong on our end. Please try again later."
-    }, status=500)
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {"status_code": 500, "message": "Something went wrong on our end. Please try again later."},
+        status=500,
+    )
 
 
 def error_403(request, exception):
     """403 - Forbidden: user doesn't have permission to access this page"""
-    return render(request, "htmlfiles/error.html", {
-        "status_code": 403,
-        "message": "You do not have permission to access this page."
-    }, status=403)
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {"status_code": 403, "message": "You do not have permission to access this page."},
+        status=403,
+    )
 
 
 def error_400(request, exception):
     """400 - Bad Request: the request sent by the browser was invalid"""
-    return render(request, "htmlfiles/error.html", {
-        "status_code": 400,
-        "message": "The request could not be understood. Please check the URL and try again."
-    }, status=400)
+    return render(
+        request,
+        "htmlfiles/error.html",
+        {
+            "status_code": 400,
+            "message": "The request could not be understood. Please check the URL and try again.",
+        },
+        status=400,
+    )
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -151,7 +170,9 @@ def signupForm_view(request):
     if request.method == "POST":
         form = signupForm(request.POST)
         if form.is_valid():
-            print("All validations passed and signup form is valid please check forms.py for validation rules")
+            print(
+                "All validations passed and signup form is valid please check forms.py for validation rules"
+            )
             print("Raw POST data:", request.POST)
             print("Cleaned data:", form.cleaned_data, type(form.cleaned_data))
             # Access individual fields using cleaned_data dictionary
@@ -212,7 +233,9 @@ Advaitam Team  # change this line according to your company
                 f"Account created successfully for {firstname.capitalize()}!. Verification email sent to {email}. Please login to continue.",  # change this line according to your company
             )
             # Redirect to login page after successful signup
-            return redirect("/loginpage/")  # change this line according to your company (update to your login URL)
+            return redirect(
+                "/loginpage/"
+            )  # change this line according to your company (update to your login URL)
         else:
             print("❌ Signup form is invalid")
             print(form.errors)  # printing error messages if form is invalid
@@ -235,7 +258,9 @@ def forgotpasswordForm_view(request):
             email = form.cleaned_data["email"]
             newpassword = form.cleaned_data["newpassword"]
             confirmpassword = form.cleaned_data["confirmpassword"]
-            print("All validations passed and forgot password form is valid please check forms.py for validation rules")
+            print(
+                "All validations passed and forgot password form is valid please check forms.py for validation rules"
+            )
             print("Email:", email)
             print("New Password:", newpassword)
             print("Confirm Password:", confirmpassword)
@@ -281,7 +306,9 @@ def forgotpasswordForm_view(request):
                 f"Password reset successfully for {email.split('@')[0].capitalize()}. Confirmation email sent to {email}. Please login with your new password to continue.",  # change this line according to your company
             )
             # Redirect to login page after successful password reset
-            return redirect("/loginpage/")  # change this line according to your company (update to your login URL)
+            return redirect(
+                "/loginpage/"
+            )  # change this line according to your company (update to your login URL)
         else:
             print("❌ Forgot password form is invalid")
             print(form.errors)  # printing error messages if form is invalid
@@ -385,7 +412,9 @@ def loginForm_view(request):
     if request.method == "POST":
         form = loginForm(request.POST)
         if form.is_valid():
-            print("All validations passed and login form is valid please check forms.py for validation rules")
+            print(
+                "All validations passed and login form is valid please check forms.py for validation rules"
+            )
             print("Raw POST data:", request.POST)
             print("Cleaned data:", form.cleaned_data, type(form.cleaned_data))
             email = form.cleaned_data["loginemail"]
@@ -399,18 +428,32 @@ def loginForm_view(request):
             except User.DoesNotExist:
                 username = None
                 print("❌ User not found for email:", email)
-                messages.error(request,"User not found ! Please check your entered data once again or sign up using signup link at bottom.",)
+                messages.error(
+                    request,
+                    "User not found ! Please check your entered data once again or sign up using signup link at bottom.",
+                )
                 return render(request, "htmlfiles/login.html", {"form": form})
             # ✅ Try login
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 print("✅ Login successful for:", username)
-                messages.success(request, f"Welcome , {username}!")  # change this line according to your company (customize welcome message)
-                return redirect(request.GET.get("next", "/home/"))  # change this line according to your company (update post-login redirect URL)
+                messages.success(
+                    request, f"Welcome , {username}!"
+                )  # change this line according to your company (customize welcome message)
+                return redirect(
+                    request.GET.get("next", "/home/")
+                )  # change this line according to your company (update post-login redirect URL)
             else:
-                print("❌ Authentication failed for:", username, "(wrong password or inactive account)")
-                messages.error(request,"Password is wrong or account is inactive.If you don't have an account, please sign up using signup link at bottom.",)
+                print(
+                    "❌ Authentication failed for:",
+                    username,
+                    "(wrong password or inactive account)",
+                )
+                messages.error(
+                    request,
+                    "Password is wrong or account is inactive.If you don't have an account, please sign up using signup link at bottom.",
+                )
         else:
             print("❌ Login form is invalid")
             print(form.errors)  # printing error messages if form is invalid
@@ -462,7 +505,9 @@ def aboutpage_view(request):
 
 @login_required
 def aboutdetail_view(request, title):
-    about_detail = get_object_or_404(aboutdetails, slug=title)  # to get record matched with the slug title
+    about_detail = get_object_or_404(
+        aboutdetails, slug=title
+    )  # to get record matched with the slug title
     return render(request, "htmlfiles/aboutdetail.html", {"about_detail": about_detail})
 
 
@@ -487,7 +532,10 @@ def contact_view(request):
     if request.method == "POST":
         form = contactusForm(request.POST)
         if form.is_valid():
-            name = (f"{request.user.first_name} {request.user.last_name}".strip().upper() or request.user.username.upper())
+            name = (
+                f"{request.user.first_name} {request.user.last_name}".strip().upper()
+                or request.user.username.upper()
+            )
             email = request.user.email
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
@@ -557,25 +605,38 @@ def contact_view(request):
 # ----------------------------------------------THE BELOW ONES ARE FOR MY PRACTICE.[CRUD USING FUNCTION BASED VIEWS] USING FUNCTION BASED VIEWS-------------------------------------------------
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 def wish_retrieveview(request):
     print(request.COOKIES)
     # count = int(request.COOKIES.get('count', 0))
     # count += 1
-    wish_list=wishdata.objects.all() # To get list of all the data in the table
+    wish_list = wishdata.objects.all()  # To get list of all the data in the table
     # wish_list = wishdata.objects.filter(name__startswith='A')  # Django ORM code to fetch all records from wishdata table whose name starts with A
     # wish_list = wishdata.objects.all().values_list("id", "name", "astrology_message")
     print(wish_list)
-    paginator = Paginator(wish_list, 8)  # 10 records per page #create an object of paginator class with what data u want to use for pagination and how many records per page
-    page_number = request.GET.get("page")  # getting the current page number from url query parameter which we passed from pagination.html file next and previous links
+    paginator = Paginator(
+        wish_list, 8
+    )  # 10 records per page #create an object of paginator class with what data u want to use for pagination and how many records per page
+    page_number = request.GET.get(
+        "page"
+    )  # getting the current page number from url query parameter which we passed from pagination.html file next and previous links
     try:
-        wish_list = paginator.page(page_number)  # getting the records of that particular page number
+        wish_list = paginator.page(
+            page_number
+        )  # getting the records of that particular page number
     except PageNotAnInteger:
-        wish_list = paginator.page(1)  # getting the first page records if page number is not an integer or if we provide direct url without page number like 127.0.0.1:8000
+        wish_list = paginator.page(
+            1
+        )  # getting the first page records if page number is not an integer or if we provide direct url without page number like 127.0.0.1:8000
     except EmptyPage:
-        wish_list = paginator.page(paginator.num_pages)  # getting the last page records if page number is out of range like if total pages are 10 and we give page number as 100
+        wish_list = paginator.page(
+            paginator.num_pages
+        )  # getting the last page records if page number is out of range like if total pages are 10 and we give page number as 100
     response = render(request, "htmlfiles/wish.html", {"wish_list": wish_list})
     # response.set_cookie('count', count)
     return response
+
 
 def wish_insertview(request):
     form = wishForm()
@@ -622,7 +683,9 @@ def wish_deleteview(request, id):
 # ------------------------------------------------THE BELOW ONES ARE FOR MY PRACTICE.[CLASS BASED VIEWS ]-------------------------------------------------------------
 class Helloworldview(View):
     def get(self, request):
-        return HttpResponse("Hello World! This is my first class based view in Django.")  # there is no template file associated with this view just returning a simple http response
+        return HttpResponse(
+            "Hello World! This is my first class based view in Django."
+        )  # there is no template file associated with this view just returning a simple http response
 
 
 # THE BELOW ONE IS A NORMAL VIEW CLASS BASED VIEW FOR RETRIEVING WISH DATA
@@ -637,8 +700,12 @@ class wishgetviewtemplateview(TemplateView):
     template_name = "htmlfiles/wish.html"
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # getting context object from parent class amd it is a dictionary
-        context["wish_list"] = (wishdata.objects.all())  # adding wish_list to context and overriding the get_context_data method with our own data
+        context = super().get_context_data(
+            **kwargs
+        )  # getting context object from parent class amd it is a dictionary
+        context["wish_list"] = (
+            wishdata.objects.all()
+        )  # adding wish_list to context and overriding the get_context_data method with our own data
         return context
 
     # ---------------------CRUD OPERATIONS USING CLASS BASED VIEWS: USE IF WE NEED TO PERFORM DB OPERATIONS------------------------------------------------
@@ -687,4 +754,3 @@ class wishdetailview(DetailView):
     model = wishdata
     # default template name is 'webapp/wishdata_detail.html'
     # default context object: wishdata(modelclassname) or object
-

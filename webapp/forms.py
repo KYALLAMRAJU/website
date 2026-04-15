@@ -48,13 +48,19 @@ class signupForm(forms.ModelForm):
     email = forms.CharField(
         label="",
         widget=forms.EmailInput(
-            attrs={"class": "form-control form-control-sm mb-4", "placeholder": "Email Address"}  # change this line according to your company
+            attrs={
+                "class": "form-control form-control-sm mb-4",
+                "placeholder": "Email Address",
+            }  # change this line according to your company
         ),
     )
     password = forms.CharField(
         label="",
         widget=forms.PasswordInput(
-            attrs={"class": "form-control form-control-sm mb-4", "placeholder": "Set your Password"}  # change this line according to your company
+            attrs={
+                "class": "form-control form-control-sm mb-4",
+                "placeholder": "Set your Password",
+            }  # change this line according to your company
         ),
     )
     bothandler = forms.CharField(required=False, widget=forms.HiddenInput())
@@ -176,7 +182,10 @@ class loginForm(forms.ModelForm):
         if not loginpassword:
             raise forms.ValidationError("Password field cannot be empty")
         if not re.search(pattern, loginpassword):
-            raise forms.ValidationError("Password must contain at least 8 characters and should contain at least one uppercase letter, ""one lowercase letter, one digit, and one special character:@$!%*?&#")
+            raise forms.ValidationError(
+                "Password must contain at least 8 characters and should contain at least one uppercase letter, "
+                "one lowercase letter, one digit, and one special character:@$!%*?&#"
+            )
         bothandler = total_cleaned_data.get("bothandler", "")
         if len(bothandler) > 0:
             raise forms.ValidationError("Dont play with my website")
@@ -260,8 +269,12 @@ class wishForm(forms.ModelForm):
         has_alpha = any(x.isalpha() for x in username)
         has_digit = any(x.isdigit() for x in username)
         if not (has_alpha and has_digit):
-            raise forms.ValidationError("Username should contain both alphabetic characters and numbers,(no special characters).")
+            raise forms.ValidationError(
+                "Username should contain both alphabetic characters and numbers,(no special characters)."
+            )
         # Check if username already exists in wishdata
         if wishdata.objects.filter(username=username).exists():
-            raise forms.ValidationError("This username already exists. Please choose a different username.")
+            raise forms.ValidationError(
+                "This username already exists. Please choose a different username."
+            )
         return total_cleaned_data
