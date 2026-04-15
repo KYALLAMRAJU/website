@@ -145,6 +145,15 @@ static/audio/audio-connection-guide.md
 static/audio/audio-html-js-deep-dive.md
 webProject/SETTINGS_DETAILED_EXPLANATION.md
 
+# ========== DEV/PRACTICE TEMPLATES (not for repo) ==========
+# Wish CRUD templates — practice only (function-based + class-based view demos)
+templates/htmlfiles/wish.html
+templates/htmlfiles/wishinsert.html
+templates/htmlfiles/wishupdate.html
+templates/htmlfiles/pagination.html
+# CBV templates folder — practice only (class-based view demos)
+templates/webapp/
+
 # ========== SECRETS & KEYS ==========
 *.pem
 *.key
