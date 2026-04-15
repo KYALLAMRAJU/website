@@ -1,6 +1,6 @@
 # ========== CORE DJANGO ==========
 Django==6.0.4
-django-environ==0.12.0
+django-environ==0.13.0
 
 # ========== DATABASE ==========
 # psycopg2 (compiled) — NOT psycopg2-binary.
@@ -10,7 +10,7 @@ django-environ==0.12.0
 psycopg2==2.9.9
 
 # ========== REST API ==========
-djangorestframework==3.16.1
+djangorestframework==3.17.0
 django-filter==25.2
 drf-spectacular==0.29.0
 
@@ -20,36 +20,33 @@ django-allauth==65.15.0
 
 # ========== STORAGE ==========
 django-storages==1.14.6
-boto3==1.42.52
+boto3==1.42.71
 
 # ========== TAGGING ==========
 django-taggit==6.1.0
 
 # ========== SERVER ==========
-gunicorn==23.0.0
-whitenoise==6.11.0
-
+gunicorn==25.1.0
+whitenoise==6.12.0
 
 # ========== PASSWORD HASHING ==========
-argon2-cffi==23.1.0
+argon2-cffi==25.1.0
 
 # ========== UTILITIES ==========
 requests==2.33.1
-python-dateutil==2.9.0
-pytz==2025.2
 
 # ========== SECURITY ==========
-django-csp==3.8        # Content-Security-Policy headers — blocks XSS attacks
+django-csp==4.0        # Content-Security-Policy headers — blocks XSS attacks (4.0+ dict format)
 
 # ========== ERROR TRACKING ==========
-sentry-sdk==2.52.0
+sentry-sdk==2.55.0
 
 # ========== MONITORING ==========
-django-cors-headers==4.3.1
+django-cors-headers==4.9.0
 
 # ========== CODE QUALITY (used in CI lint job — not needed at runtime) ==========
-ruff==0.9.10           # Fast Python linter + formatter (replaces flake8, isort, pyupgrade)
+ruff==0.15.7           # Fast Python linter + formatter (replaces flake8, isort, pyupgrade)
 
 # ========== CACHING (ElastiCache / Redis) ==========
-redis==5.0.8
-django-redis==5.4.0
+redis==7.3.0
+django-redis==6.0.0
