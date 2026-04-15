@@ -1,0 +1,78 @@
+# ============================================================
+# .dockerignore — Excludes files from Docker build context
+# ============================================================
+# Without this file, Docker sends EVERYTHING to the build daemon.
+# This file keeps the image lean, fast to build, and secure
+# (secrets and dev-only files never enter the image).
+#
+# Rule syntax is identical to .gitignore.
+# ============================================================
+
+# ── Version Control ──────────────────────────────────────────
+.git
+.gitignore
+
+# ── Python Artifacts ─────────────────────────────────────────
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.eggs
+dist
+build
+*.egg
+
+# ── Virtual Environments ─────────────────────────────────────
+.venv
+venv
+env
+
+# ── Secrets — NEVER copy into image ─────────────────────────
+.env
+.env.*
+*.pem
+*.key
+
+# ── Local Database ────────────────────────────────────────────
+db.sqlite3
+identifier.sqlite
+*.sqlite3
+*.db
+mydatabase
+
+# ── Collected Static (rebuilt via collectstatic in prod) ─────
+staticfiles/
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Test Artifacts ────────────────────────────────────────────
+.pytest_cache
+.coverage
+htmlcov/
+test-results/
+webapp/tests/
+
+# ── CI/CD & GitHub ────────────────────────────────────────────
+.github/
+
+# ── Dev / Docs (not needed at runtime) ───────────────────────
+deploy/
+*.md
+*.sh
+Makefile
+docs/
+
+# ── Editor & OS Artifacts ─────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Node (if any frontend tools) ──────────────────────────────
+node_modules/
+
