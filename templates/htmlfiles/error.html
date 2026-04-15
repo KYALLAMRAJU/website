@@ -1,0 +1,32 @@
+{% extends "htmlfiles/base.html" %}
+{% block title_block %}<title>Error {{ status_code }}</title>{% endblock %}
+{% block content %}
+
+<div class="d-flex flex-column align-items-center justify-content-center text-center" style="min-height: 60vh;">
+
+    <h1 class="display-1 fw-bold text-danger">{{ status_code }}</h1>
+
+    <h3 class="mb-3">
+        {% if status_code == 404 %}
+            Page Not Found
+        {% elif status_code == 403 %}
+            Access Forbidden
+        {% elif status_code == 400 %}
+            Bad Request
+        {% elif status_code == 500 %}
+            Internal Server Error
+        {% else %}
+            Something Went Wrong
+        {% endif %}
+    </h3>
+
+    <p class="text-muted fs-5 mb-4">{{ message }}</p>
+
+    <a href="/home/" class="btn btn-dark btn-lg">
+        <i class="fa-solid fa-house me-2"></i>Go Back Home
+    </a>
+
+</div>
+
+{% endblock %}
+
