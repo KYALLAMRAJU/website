@@ -8,12 +8,10 @@ Architecture:
 
 import logging
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
 import environ
-import rest_framework
-from rest_framework.authentication import *
-from rest_framework.permissions import *
 
 # ========== ENVIRONMENT SETUP ==========
 BASE_DIR = Path(__file__).resolve().parent.parent

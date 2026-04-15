@@ -688,3 +688,4 @@ class wishdetailview(DetailView):
     model = wishdata
     # default template name is 'webapp/wishdata_detail.html'
     # default context object: wishdata(modelclassname) or object
+
