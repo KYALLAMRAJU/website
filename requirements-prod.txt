@@ -34,7 +34,7 @@ whitenoise==6.11.0
 argon2-cffi==23.1.0
 
 # ========== UTILITIES ==========
-requests==2.33.0
+requests==2.33.1
 python-dateutil==2.9.0
 pytz==2025.2
 
