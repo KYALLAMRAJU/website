@@ -29,7 +29,7 @@ env/
 .env.local.py
 
 # ========== DJANGO ==========
-# API folder (dev/practice only — not for repo)
+# API folder (practice only — not for repo)
 webapp/api/
 
 db.sqlite3
