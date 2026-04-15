@@ -6,16 +6,15 @@ version: 2
 updates:
   # Python Dependencies — scans requirements-prod.txt in the repo root
   - package-ecosystem: "pip"
-    directory: "/"
+    directory: "/"            # change this line according to your company (update if requirements file is in a subdirectory)
     schedule:
-      interval: "daily"
-      time: "03:00"
-    open-pull-requests-limit: 5
+      interval: "daily"       # change this line according to your company (options: daily, weekly, monthly)
+      time: "03:00"           # change this line according to your company (update scan time to suit your timezone)
+    open-pull-requests-limit: 5  # change this line according to your company (adjust how many PRs Dependabot can open)
     commit-message:
-      prefix: "security:"
+      prefix: "security:"    # change this line according to your company (update commit message prefix)
       include: "scope"
     allow:
-      - dependency-type: "production"
+      - dependency-type: "production"  # change this line according to your company (add "development" if you want dev deps updated too)
     pull-request-branch-name:
       separator: "/"
-

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# ========== ADVAITAM DEPLOYMENT SCRIPT FOR AWS EC2 ==========
-# Target: Ubuntu 24.04 LTS ARM64 on EC2 t4g.micro
+# ========== ADVAITAM DEPLOYMENT SCRIPT FOR AWS EC2 ==========  # change this line according to your company (rename to your project)
+# Target: Ubuntu 24.04 LTS ARM64 on EC2 t4g.micro  # change this line according to your company (update target OS/instance type)
 # Usage: bash deploy.sh
 # Run as: ubuntu user (with sudo privileges)
 
 set -e  # Exit on error
 
-echo "========== ADVAITAM DEPLOYMENT STARTED =========="
+echo "========== ADVAITAM DEPLOYMENT STARTED =========="  # change this line according to your company
 
 # Colors for output
 RED='\033[0;31m'
@@ -16,13 +16,13 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # ========== CONFIGURATION ==========
-APP_USER="advaitam"
-PROJECT_DIR="/home/advaitam/app"
-VENV_DIR="/home/advaitam/venv"
+APP_USER="advaitam"                          # change this line according to your company (update Linux username)
+PROJECT_DIR="/home/advaitam/app"             # change this line according to your company (update project path)
+VENV_DIR="/home/advaitam/venv"               # change this line according to your company (update venv path)
 PYTHON="$VENV_DIR/bin/python"
 PIP="$VENV_DIR/bin/pip"
-DOMAIN="advaitam.info"                   # Used in Step 12 certbot output and next-steps summary
-ORIGIN_DOMAIN="origin.advaitam.info"    # Used in Nginx server_name and certbot command
+DOMAIN="advaitam.info"                       # change this line according to your company (update to your domain)
+ORIGIN_DOMAIN="origin.advaitam.info"        # change this line according to your company (update to your origin domain)
 
 # Step 1: Update system
 echo -e "${YELLOW}[1/12] Updating system packages...${NC}"
@@ -34,7 +34,8 @@ sudo apt install -y \
   python3.12 python3.12-venv python3.12-dev \
   postgresql-16 postgresql-client-16 libpq-dev \
   nginx certbot python3-certbot-nginx \
-  git supervisor build-essential curl
+  git build-essential curl
+# NOTE: process management is handled by systemd (Steps 9-10), NOT supervisor
 
 # Step 3: Create app user
 echo -e "${YELLOW}[3/12] Creating app user...${NC}"
@@ -56,11 +57,11 @@ fi
 
 # Create DB + user (idempotent)
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='advaitam_db'" | grep -q 1 || \
-  sudo -u postgres psql -c "CREATE DATABASE advaitam_db;"
+  sudo -u postgres psql -c "CREATE DATABASE advaitam_db;"  # change this line according to your company (update DB name)
 sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='advaitam_user'" | grep -q 1 || \
-  sudo -u postgres psql -c "CREATE USER advaitam_user WITH PASSWORD '$DB_PASSWORD';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE advaitam_db TO advaitam_user;"
-sudo -u postgres psql -c "ALTER DATABASE advaitam_db OWNER TO advaitam_user;"
+  sudo -u postgres psql -c "CREATE USER advaitam_user WITH PASSWORD '$DB_PASSWORD';"  # change this line according to your company (update DB user)
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE advaitam_db TO advaitam_user;"  # change this line according to your company
+sudo -u postgres psql -c "ALTER DATABASE advaitam_db OWNER TO advaitam_user;"  # change this line according to your company
 
 # Step 5: Clone or update project
 echo -e "${YELLOW}[5/12] Cloning/updating project...${NC}"
@@ -69,7 +70,7 @@ sudo chown $APP_USER:$APP_USER "$PROJECT_DIR"
 if [ -d "$PROJECT_DIR/.git" ]; then
     sudo -u $APP_USER git -C "$PROJECT_DIR" pull origin main || { echo -e "${RED}Git pull failed!${NC}"; exit 1; }
 else
-    sudo -u $APP_USER git clone https://github.com/KYALLAMRAJU/website.git "$PROJECT_DIR" || { echo -e "${RED}Git clone failed! Check repo URL and SSH keys.${NC}"; exit 1; }
+    sudo -u $APP_USER git clone https://github.com/KYALLAMRAJU/website.git "$PROJECT_DIR" || { echo -e "${RED}Git clone failed! Check repo URL and SSH keys.${NC}"; exit 1; }  # change this line according to your company (update to your GitHub repo URL)
 fi
 
 # Verify project was cloned successfully
@@ -88,22 +89,29 @@ sudo -u $APP_USER $PIP install -r "$PROJECT_DIR/requirements-prod.txt"
 
 # Step 7: Environment file check
 echo -e "${YELLOW}[7/12] Checking .env file...${NC}"
-if [ ! -f "$PROJECT_DIR/.env" ]; then
-    echo -e "${RED}⚠️  .env file not found! Create it before continuing:${NC}"
-    echo -e "${RED}   sudo -u $APP_USER nano $PROJECT_DIR/.env${NC}"
-    echo -e "${RED}   (use deploy/.env.prod.template as reference)${NC}"
+# The production env file is named .env.production.bak (chmod 600, never committed to git)
+# On the very first deploy you must create it manually before running this script:
+#   sudo -u $APP_USER nano $PROJECT_DIR/.env.production.bak
+# Then symlink it so Django picks it up via python-decouple / environ:
+#   sudo -u $APP_USER ln -sf $PROJECT_DIR/.env.production.bak $PROJECT_DIR/.env
+ENV_FILE="$PROJECT_DIR/.env"
+if [ ! -f "$ENV_FILE" ]; then
+    echo -e "${RED}⚠️  .env file not found at $ENV_FILE!${NC}"
+    echo -e "${RED}   Create it first (see Step 3.9 in AWS_PRODUCTION_DEPLOYMENT_GUIDE.md):${NC}"
+    echo -e "${RED}   sudo -u $APP_USER nano $PROJECT_DIR/.env.production.bak${NC}"
+    echo -e "${RED}   sudo -u $APP_USER ln -sf $PROJECT_DIR/.env.production.bak $PROJECT_DIR/.env${NC}"
     exit 1
 fi
-sudo chmod 600 "$PROJECT_DIR/.env"
-sudo chown $APP_USER:$APP_USER "$PROJECT_DIR/.env"
+sudo chmod 600 "$ENV_FILE"
+sudo chown $APP_USER:$APP_USER "$ENV_FILE"
 
 # Validate critical .env variables
 echo -e "${YELLOW}Validating .env file...${NC}"
 REQUIRED_VARS=("DEBUG" "SECRET_KEY" "ALLOWED_HOSTS" "DB_HOST" "DB_NAME" "DB_USER" "DB_PASSWORD")
 for var in "${REQUIRED_VARS[@]}"; do
-    if ! grep -q "^${var}=" "$PROJECT_DIR/.env"; then
+    if ! grep -q "^${var}=" "$ENV_FILE"; then
         echo -e "${RED}⚠️  Missing required variable in .env: $var${NC}"
-        echo -e "${RED}   Check deploy/.env.prod.template for all required variables${NC}"
+        echo -e "${RED}   Check Step 3.9 in AWS_PRODUCTION_DEPLOYMENT_GUIDE.md for all required variables${NC}"
         exit 1
     fi
 done
@@ -126,9 +134,9 @@ sudo -u $APP_USER bash -c "cd $PROJECT_DIR && $PYTHON manage.py collectstatic --
 echo -e "${YELLOW}[8b] Syncing audio files to S3 (skipped if no .mp3 files present)...${NC}"
 AUDIO_DIR="$PROJECT_DIR/static/audio"
 if compgen -G "$AUDIO_DIR/**/*.mp3" > /dev/null 2>&1 || find "$AUDIO_DIR" -name "*.mp3" | grep -q .; then
-    USE_S3_VAL=$(grep "^USE_S3=" "$PROJECT_DIR/.env" | cut -d'=' -f2 | tr -d '[:space:]')
+    USE_S3_VAL=$(grep "^USE_S3=" "$ENV_FILE" | cut -d'=' -f2 | tr -d '[:space:]')
     if [ "$USE_S3_VAL" = "True" ] || [ "$USE_S3_VAL" = "true" ]; then
-        S3_BUCKET=$(grep "^AWS_STORAGE_BUCKET_NAME=" "$PROJECT_DIR/.env" | cut -d'=' -f2 | tr -d '[:space:]')
+        S3_BUCKET=$(grep "^AWS_STORAGE_BUCKET_NAME=" "$ENV_FILE" | cut -d'=' -f2 | tr -d '[:space:]')
         S3_BUCKET="${S3_BUCKET:-advaitam-assets}"
         echo -e "${YELLOW}   Uploading .mp3 files to s3://$S3_BUCKET/static/audio/ ...${NC}"
         aws s3 sync "$AUDIO_DIR/" "s3://$S3_BUCKET/static/audio/" \
@@ -149,23 +157,23 @@ fi
 
 # Step 9: Gunicorn socket directory
 echo -e "${YELLOW}[9/12] Creating Gunicorn socket directory...${NC}"
-sudo mkdir -p /run/advaitam
+sudo mkdir -p /run/advaitam         # change this line according to your company (update socket dir name)
 sudo chown $APP_USER:www-data /run/advaitam
 sudo chmod 770 /run/advaitam
 
 # Make it persistent across reboots
-sudo tee /etc/tmpfiles.d/advaitam.conf > /dev/null <<EOF
+sudo tee /etc/tmpfiles.d/advaitam.conf > /dev/null <<EOF  # change this line according to your company (update conf file name)
 d /run/advaitam 0770 $APP_USER www-data -
 EOF
 
 # Step 10: Configure Gunicorn systemd service
 echo -e "${YELLOW}[10/12] Configuring Gunicorn systemd service...${NC}"
-sudo tee /etc/systemd/system/advaitam.socket > /dev/null <<EOF
+sudo tee /etc/systemd/system/advaitam.socket > /dev/null <<EOF  # change this line according to your company (update service name)
 [Unit]
-Description=Advaitam Gunicorn Socket
+Description=Advaitam Gunicorn Socket  # change this line according to your company
 
 [Socket]
-ListenStream=/run/advaitam/gunicorn.sock
+ListenStream=/run/advaitam/gunicorn.sock  # change this line according to your company (update socket path)
 SocketUser=$APP_USER
 SocketGroup=www-data
 SocketMode=0660
@@ -174,10 +182,10 @@ SocketMode=0660
 WantedBy=sockets.target
 EOF
 
-sudo tee /etc/systemd/system/advaitam.service > /dev/null <<EOF
+sudo tee /etc/systemd/system/advaitam.service > /dev/null <<EOF  # change this line according to your company (update service name)
 [Unit]
-Description=Advaitam Django Gunicorn
-Requires=advaitam.socket
+Description=Advaitam Django Gunicorn  # change this line according to your company
+Requires=advaitam.socket              # change this line according to your company (update socket name)
 After=network.target postgresql.service
 
 [Service]
@@ -188,7 +196,7 @@ EnvironmentFile=$PROJECT_DIR/.env
 Environment=DJANGO_ENV=production
 ExecStart=$VENV_DIR/bin/gunicorn \\
           --config $PROJECT_DIR/gunicorn.conf.py \\
-          webProject.wsgi:application
+          webProject.wsgi:application  # change this line according to your company (update to your project name)
 ExecReload=/bin/kill -s HUP \$MAINPID
 KillMode=mixed
 TimeoutStopSec=30
@@ -201,32 +209,32 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable advaitam.socket advaitam.service
-sudo systemctl start advaitam.socket
+sudo systemctl enable advaitam.socket advaitam.service  # change this line according to your company (update service name)
+sudo systemctl start advaitam.socket                    # change this line according to your company (update socket name)
 # Use 'reload' (SIGHUP → graceful worker replacement, zero downtime) not 'restart' (kills workers immediately)
-sudo systemctl reload advaitam.service 2>/dev/null || sudo systemctl restart advaitam.service
+sudo systemctl reload advaitam.service 2>/dev/null || sudo systemctl restart advaitam.service  # change this line according to your company (update service name)
 
 # Step 11: Configure Nginx
 echo -e "${YELLOW}[11/12] Configuring Nginx...${NC}"
-sudo tee /etc/nginx/sites-available/advaitam > /dev/null <<'NGINXEOF'
+sudo tee /etc/nginx/sites-available/advaitam > /dev/null <<'NGINXEOF'  # change this line according to your company (update config file name)
 # HTTP Server (Certbot will upgrade this to HTTPS automatically)
 server {
     listen 80;
-    server_name origin.advaitam.info;
+    server_name origin.advaitam.info;  # change this line according to your company (update to your origin domain)
 
-    client_max_body_size 100M;
+    client_max_body_size 100M;  # change this line according to your company (adjust upload size limit)
     keepalive_timeout    65;
 
     # Proxy to Gunicorn via Unix socket
     location / {
-        proxy_pass          http://unix:/run/advaitam/gunicorn.sock;
+        proxy_pass          http://unix:/run/advaitam/gunicorn.sock;  # change this line according to your company (update socket path)
         proxy_set_header    Host              $host;
         proxy_set_header    X-Real-IP         $remote_addr;
         proxy_set_header    X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header    X-Forwarded-Proto $http_x_forwarded_proto;
-        proxy_read_timeout  120s;
+        proxy_read_timeout  120s;   # change this line according to your company (match Gunicorn timeout)
         proxy_connect_timeout 10s;
-        proxy_send_timeout  120s;
+        proxy_send_timeout  120s;   # change this line according to your company (match Gunicorn timeout)
         proxy_buffering     on;
         proxy_buffer_size   8k;
         proxy_buffers       16 8k;
@@ -234,7 +242,7 @@ server {
 
     # Static fallback (normally served by CloudFront → S3 directly)
     location /static/ {
-        alias /home/advaitam/app/staticfiles/;
+        alias /home/advaitam/app/staticfiles/;  # change this line according to your company (update to your staticfiles path)
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
@@ -252,15 +260,17 @@ server {
     add_header X-Frame-Options "DENY" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
-    access_log /home/advaitam/app/logs/nginx_access.log;
-    error_log  /home/advaitam/app/logs/nginx_error.log;
+    access_log /home/advaitam/app/logs/nginx_access.log;  # change this line according to your company (update log path)
+    error_log  /home/advaitam/app/logs/nginx_error.log;   # change this line according to your company (update log path)
 }
 NGINXEOF
 
-sudo ln -sf /etc/nginx/sites-available/advaitam /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/advaitam /etc/nginx/sites-enabled/  # change this line according to your company (update config file name)
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl enable nginx
+# 'restart' is fine here — this is the INITIAL setup, nginx isn't serving real traffic yet.
+# After go-live, GitHub Actions uses 'reload nginx' (no downtime) for subsequent deploys.
 sudo systemctl restart nginx
 
 # Step 12: SSL Certificate
@@ -269,23 +279,23 @@ echo ""
 echo -e "${YELLOW}⚠️  IMPORTANT: Run this command AFTER DNS propagation (typically 5-30 minutes):${NC}"
 echo ""
 echo -e "${GREEN}   1. First, verify DNS is ready:${NC}"
-echo -e "${GREEN}      nslookup origin.advaitam.info${NC}"
+echo -e "${GREEN}      nslookup origin.advaitam.info${NC}"  # change this line according to your company (update domain)
 echo -e "${GREEN}      (should return your EC2 IP)${NC}"
 echo ""
 echo -e "${GREEN}   2. Then run:${NC}"
-echo -e "${GREEN}      sudo certbot --nginx -d origin.advaitam.info${NC}"
+echo -e "${GREEN}      sudo certbot --nginx -d origin.advaitam.info${NC}"  # change this line according to your company (update domain)
 echo ""
 echo -e "${GREEN}   3. Certbot will auto-renew 30 days before expiry (systemd timer)${NC}"
 echo ""
-echo -e "${GREEN}========== DEPLOYMENT COMPLETED ==========${NC}"
+echo -e "${GREEN}========== DEPLOYMENT COMPLETED ==========${NC}"  # change this line according to your company
 echo -e "${GREEN}✅ Services running:${NC}"
-sudo systemctl status advaitam.service --no-pager -l | head -5
+sudo systemctl status advaitam.service --no-pager -l | head -5  # change this line according to your company (update service name)
 echo ""
 echo -e "${YELLOW}📋 Next steps:${NC}"
 echo -e "  1. Set up Route 53, S3, CloudFront, ACM (see deploy/05-AWS/AWS_PRODUCTION_DEPLOYMENT_GUIDE.md)"
-echo -e "  2. Run: sudo certbot --nginx -d origin.advaitam.info"
+echo -e "  2. Run: sudo certbot --nginx -d origin.advaitam.info"  # change this line according to your company (update domain)
 echo -e "  3. Set AWS_S3_CUSTOM_DOMAIN in .env to your CloudFront domain"
 echo -e "  4. Run: python manage.py collectstatic --noinput (uploads CSS/JS/images to S3)"
-echo -e "  5. Upload audio files from LOCAL machine:"
-echo -e "     aws s3 sync static/audio/ s3://advaitam-assets/static/audio/ --exclude \"*.md\" --content-type audio/mpeg"
-echo -e "  6. Test: curl https://advaitam.info/"
+echo -e "  5. Upload audio files from LOCAL machine:"  # change this line according to your company (update if using different media types)
+echo -e "     aws s3 sync static/audio/ s3://advaitam-assets/static/audio/ --exclude \"*.md\" --content-type audio/mpeg"  # change this line according to your company (update bucket name and paths)
+echo -e "  6. Test: curl https://advaitam.info/"  # change this line according to your company (update domain)

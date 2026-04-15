@@ -1,16 +1,19 @@
 # ========== ADVAITAM DJANGO DOCKERFILE ==========
+# change this line according to your company (rename to your project)
 # Multi-stage build: builder stage compiles dependencies, final stage is lean runtime image.
 # Usage:
 #   docker build -t advaitam .
+#   # change this line according to your company (update image name)
 #   docker run --env-file .env -p 8000:8000 advaitam
+#   # change this line according to your company (update image name and port)
 #
 # For local dev with database + Redis, use docker-compose instead:
 #   docker compose up
 
-# ── Stage 1: Builder — install compiled dependencies ──────────────────────────
+# ── Stage 1: Builder ──────────────────────────────────────────────────────────
+# change this line according to your company (update Python version if needed)
 FROM python:3.12-slim AS builder
 
-# Install OS-level build dependencies (needed to compile psycopg2, argon2-cffi)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         libpq-dev \
@@ -18,48 +21,43 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Copy requirements first (layer cache — only re-installs when requirements change)
+# change this line according to your company (update to your requirements file)
 COPY requirements-prod.txt .
 
 RUN pip install --upgrade pip \
  && pip install --no-cache-dir --prefix=/install -r requirements-prod.txt
 
 
-# ── Stage 2: Runtime — lean final image ──────────────────────────────────────
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
+# change this line according to your company (update Python version if needed)
 FROM python:3.12-slim AS runtime
 
-# Runtime-only OS deps (libpq for psycopg2, no build tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libpq5 \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root app user (never run as root in production)
+# change this line according to your company (update username if needed)
 RUN useradd --create-home --shell /bin/bash appuser
 
 WORKDIR /app
 
-# Copy installed packages from builder stage
 COPY --from=builder /install /usr/local
 
-# Copy project source
 COPY --chown=appuser:appuser . .
 
-# Create required directories
+# change this line according to your company (add/remove directories as needed)
 RUN mkdir -p logs staticfiles media
 
-# Switch to non-root user
 USER appuser
 
-# Collect static files (requires SECRET_KEY env var at build time if USE_S3=False)
-# Skipped here — run `python manage.py collectstatic` in deploy pipeline instead
-
+# change this line according to your company (update port if needed)
 EXPOSE 8000
 
-# Health check — Docker daemon will mark container unhealthy if this fails
+# change this line according to your company (update health check URL)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -fs http://localhost:8000/health/ || exit 1
 
-# Default command: run Gunicorn using gunicorn.conf.py
+# change this line according to your company (update to your project name in wsgi:application)
 CMD ["gunicorn", "--config", "gunicorn.conf.py", "webProject.wsgi:application"]
-

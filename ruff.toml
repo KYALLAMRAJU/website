@@ -8,6 +8,7 @@
 #   ruff format . --check → format check
 #   ruff format .         → format + auto-fix
 #   make check            → run both (via Makefile)
+#   ruff check . --select I001 → check only import ordering issues (for quick feedback)
 
 # Target Python version (match your runtime)
 target-version = "py312"
