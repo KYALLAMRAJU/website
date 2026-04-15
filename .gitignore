@@ -29,6 +29,9 @@ env/
 .env.local.py
 
 # ========== DJANGO ==========
+# API folder (dev/practice only — not for repo)
+webapp/api/
+
 db.sqlite3
 identifier.sqlite
 *.sqlite3
@@ -48,6 +51,7 @@ deploy/
 # ========== TEMPORARY / DEV-ONLY SCRIPTS ==========
 # NOTE: build_docs.py and docs.bat are intentionally NOT ignored —
 #       they are permanent project tools committed to the repo.
+webapp/urls_dev.py
 write_settings.py
 fakerdata.py
 oracle_patch.py
@@ -107,6 +111,10 @@ nosetests.xml
 coverage.xml
 test-results/
 junit.xml
+
+# Test files (dev-only — not committed to repo)
+webapp/tests/
+webapp/tests.py
 
 # ========== TEMPORARY / CACHE ==========
 *.tmp

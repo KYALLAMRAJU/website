@@ -93,6 +93,7 @@ def test_user(db):
 # =============================================================================
 
 
+@pytest.mark.django_db
 class TestLoginGET:
     """
     GROUP 1: Testing the GET request (just loading the login page)
@@ -182,6 +183,7 @@ class TestLoginGET:
 class TestLoginPOST:
     """GROUP 2: Testing POST requests to the login form."""
 
+    @pytest.mark.django_db
     def test_empty_form_submission_stays_on_login_page(self, client):
         """
         What happens if user clicks Login with empty fields?
@@ -381,6 +383,7 @@ class TestLoginRedirectBehaviour:
 # =============================================================================
 
 
+@pytest.mark.django_db
 class TestLoginInvalidInputs:
     """GROUP 4: Testing many invalid inputs using parametrize."""
 
