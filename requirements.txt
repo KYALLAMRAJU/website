@@ -6,6 +6,7 @@
 #   - psycopg2-binary (easy install, no system libs needed locally)
 #   - pytest + testing tools added
 #   - faker added (for fakerdata.py local script)
+#   - ruff added (linter — CI/dev only, NOT needed on production server)
 
 # ========== CORE DJANGO ==========
 Django==6.0.4
@@ -17,27 +18,31 @@ django-environ==0.13.0
 psycopg2-binary==2.9.11
 
 # ========== REST API ==========
-djangorestframework==3.17.0
-django-filter==25.2
+djangorestframework==3.17.1
 drf-spectacular==0.29.0
 
 # ========== AUTHENTICATION ==========
 djangorestframework-simplejwt==5.5.1
-django-allauth==65.15.0
+django-allauth==65.16.0
+cryptography==46.0.7
 
 # ========== STORAGE ==========
 django-storages==1.14.6
-boto3==1.42.71
+boto3==1.42.89
 
 # ========== TAGGING ==========
 django-taggit==6.1.0
 
 # ========== SERVER ==========
-gunicorn==25.1.0
+gunicorn==25.3.0
 whitenoise==6.12.0
 
 # ========== PASSWORD HASHING ==========
+# argon2-cffi  → primary hasher:  Argon2PasswordHasher
+# bcrypt        → fallback hasher: BCryptSHA256PasswordHasher + BCryptPasswordHasher
+# Both are listed in settings.py PASSWORD_HASHERS — BOTH must be installed or login breaks
 argon2-cffi==25.1.0
+bcrypt==5.0.0
 
 # ========== UTILITIES ==========
 requests==2.33.1
@@ -46,17 +51,16 @@ requests==2.33.1
 django-csp==4.0        # Content-Security-Policy headers — blocks XSS attacks (4.0+ dict format)
 
 # ========== ERROR TRACKING ==========
-sentry-sdk==2.55.0
+sentry-sdk==2.58.0
 
 # ========== MONITORING ==========
 django-cors-headers==4.9.0
 
-# ========== CODE QUALITY ==========
-ruff==0.15.7           # Fast Python linter + formatter (replaces flake8, isort, pyupgrade)
+# ========== CODE QUALITY (dev/CI only — NOT in requirements-prod.txt) ==========
+ruff==0.15.11          # Fast Python linter + formatter (replaces flake8, isort, pyupgrade)
 
-# ========== CACHING ==========
-redis==7.3.0
-django-redis==6.0.0
+# ========== CACHING (Django built-in RedisCache + redis-py client) ==========
+redis==7.4.0
 
 # ========== TESTING ==========
 pytest==9.0.3

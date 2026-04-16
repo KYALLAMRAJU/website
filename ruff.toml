@@ -11,7 +11,7 @@
 #   ruff check . --select I001 → check only import ordering issues (for quick feedback)
 
 # Target Python version (match your runtime)
-target-version = "py312"
+target-version = "py314"
 
 # Max line length (88 = Black default; most companies use 88 or 100)
 line-length = 100
@@ -37,7 +37,7 @@ exclude = [
 #   F     = pyflakes (undefined names, unused imports)
 #   I     = isort (import ordering)
 #   N     = pep8-naming conventions
-#   UP    = pyupgrade (modernize syntax for Python 3.12)
+#   UP    = pyupgrade (modernize syntax for Python 3.14)
 #   B     = flake8-bugbear (common bug patterns)
 #   S     = flake8-bandit (security issues) — enable selectively
 #   DJ    = flake8-django (Django-specific checks)

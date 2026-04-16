@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 APP_USER="advaitam"                          # change this line according to your company (update Linux username)
 PROJECT_DIR="/home/advaitam/app"             # change this line according to your company (update project path)
 VENV_DIR="/home/advaitam/venv"               # change this line according to your company (update venv path)
-PYTHON="$VENV_DIR/bin/python"
+PYTHON="$VENV_DIR/bin/python3.14"
 PIP="$VENV_DIR/bin/pip"
 DOMAIN="advaitam.info"                       # change this line according to your company (update to your domain)
 ORIGIN_DOMAIN="origin.advaitam.info"        # change this line according to your company (update to your origin domain)
@@ -30,8 +30,11 @@ sudo apt update && sudo apt upgrade -y
 
 # Step 2: Install system dependencies
 echo -e "${YELLOW}[2/12] Installing system dependencies...${NC}"
+sudo add-apt-repository ppa:deadsnakes/ppa -y
+sudo apt update
+
 sudo apt install -y \
-  python3.12 python3.12-venv python3.12-dev \
+  python3.14 python3.14-venv python3.14-dev \
   postgresql-16 postgresql-client-16 libpq-dev \
   nginx certbot python3-certbot-nginx \
   git build-essential curl
@@ -82,7 +85,7 @@ fi
 # Step 6: Python virtual environment
 echo -e "${YELLOW}[6/12] Setting up Python virtual environment...${NC}"
 if [ ! -d "$VENV_DIR" ]; then
-    sudo -u $APP_USER python3.12 -m venv "$VENV_DIR"
+    sudo -u $APP_USER python3.14 -m venv "$VENV_DIR"
 fi
 sudo -u $APP_USER $PIP install --upgrade pip
 sudo -u $APP_USER $PIP install -r "$PROJECT_DIR/requirements-prod.txt"

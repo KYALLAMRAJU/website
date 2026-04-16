@@ -12,7 +12,7 @@
 
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
 # change this line according to your company (update Python version if needed)
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -30,7 +30,7 @@ RUN pip install --upgrade pip \
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 # change this line according to your company (update Python version if needed)
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libpq5 \
