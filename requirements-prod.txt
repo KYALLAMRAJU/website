@@ -49,5 +49,5 @@ django-cors-headers==4.9.0
 ruff==0.15.7           # Fast Python linter + formatter (replaces flake8, isort, pyupgrade)
 
 # ========== CACHING (ElastiCache / Redis) ==========
-redis==7.3.0
+redis==7.4.0
 django-redis==6.0.0
