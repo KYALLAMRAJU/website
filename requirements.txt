@@ -17,7 +17,7 @@ django-environ==0.13.0
 psycopg2-binary==2.9.11
 
 # ========== REST API ==========
-djangorestframework==3.17.0
+djangorestframework==3.17.1
 django-filter==25.2
 drf-spectacular==0.29.0
 
