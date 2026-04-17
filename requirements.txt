@@ -69,4 +69,4 @@ pytest-html==4.2.0
 coverage==7.8.0
 
 # ========== DEV TOOLS ==========
-Faker==40.11.0         # Used by fakerdata.py (local data seeding script)
+Faker==40.13.0         # Used by fakerdata.py (local data seeding script)
