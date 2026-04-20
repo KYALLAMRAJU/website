@@ -20,7 +20,7 @@ cryptography==46.0.7      # Required by django-allauth for Google OAuth JWT hand
 
 # ========== STORAGE ==========
 django-storages==1.14.6
-boto3==1.42.89
+boto3==1.42.91
 
 # ========== TAGGING ==========
 django-taggit==6.1.0
