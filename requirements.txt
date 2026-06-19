@@ -24,7 +24,7 @@ drf-spectacular==0.29.0
 # ========== AUTHENTICATION ==========
 djangorestframework-simplejwt==5.5.1
 django-allauth==65.16.0
-cryptography==46.0.7
+cryptography==48.0.1
 
 # ========== STORAGE ==========
 django-storages==1.14.6

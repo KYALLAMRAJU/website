@@ -16,7 +16,7 @@ drf-spectacular==0.29.0
 # ========== AUTHENTICATION ==========
 djangorestframework-simplejwt==5.5.1
 django-allauth==65.16.0
-cryptography==46.0.7      # Required by django-allauth for Google OAuth JWT handling
+cryptography==48.0.1      # Required by django-allauth for Google OAuth JWT handling
 
 # ========== STORAGE ==========
 django-storages==1.14.6
