@@ -9,7 +9,7 @@
 #   - ruff added (linter — CI/dev only, NOT needed on production server)
 
 # ========== CORE DJANGO ==========
-Django==6.0.4
+Django==6.0.7
 django-environ==0.13.0
 
 # ========== DATABASE ==========
